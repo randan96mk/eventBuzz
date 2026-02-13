@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProfileScreen(
+    isDarkMode: Boolean = false,
+    onDarkModeChanged: (Boolean) -> Unit = {},
     onNavigateToAuth: () -> Unit = {},
 ) {
     Column(
@@ -69,13 +71,12 @@ fun ProfileScreen(
         )
 
         // Dark mode
-        var darkMode by remember { mutableStateOf(false) }
         ListItem(
             headlineContent = { Text("Dark mode") },
             trailingContent = {
                 Switch(
-                    checked = darkMode,
-                    onCheckedChange = { darkMode = it },
+                    checked = isDarkMode,
+                    onCheckedChange = onDarkModeChanged,
                 )
             },
         )
