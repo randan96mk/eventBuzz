@@ -390,7 +390,7 @@ private fun createMarkerBitmap(): Bitmap {
 
     // Draw circle
     val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#6750A4")
+        color = Color.parseColor("#D97706")
         style = Paint.Style.FILL
     }
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, circlePaint)
