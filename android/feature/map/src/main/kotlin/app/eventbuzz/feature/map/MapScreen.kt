@@ -377,11 +377,17 @@ private fun MapLibreView(
         mapView.getMapAsync { map ->
             map.markers.forEach { map.removeMarker(it) }
 
-            val markerIcon = createMarkerBitmap()
-            val icon = IconFactory.getInstance(context).fromBitmap(markerIcon)
+            val iconFactory = IconFactory.getInstance(context)
+            val iconCache = mutableMapOf<String, org.maplibre.android.annotations.Icon>()
 
             val eventByTitle = mutableMapOf<String, Event>()
             events.forEach { event ->
+                val colorHex = event.category.colorHex
+                val letter = event.category.name.first().uppercase()
+                val icon = iconCache.getOrPut(colorHex) {
+                    iconFactory.fromBitmap(createMarkerBitmap(colorHex, letter))
+                }
+
                 map.addMarker(
                     MarkerOptions()
                         .position(LatLng(event.location.latitude, event.location.longitude))
@@ -438,19 +444,20 @@ private fun MapLibreView(
     )
 }
 
-private fun createMarkerBitmap(): Bitmap {
+private fun createMarkerBitmap(colorHex: String, letter: String): Bitmap {
     val size = 48
     val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
 
-    // Draw circle
+    // Draw filled circle with category color
     val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#00C853")
+        color = Color.parseColor(colorHex)
         style = Paint.Style.FILL
+        setShadowLayer(4f, 0f, 2f, Color.argb(80, 0, 0, 0))
     }
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, circlePaint)
 
-    // Draw border
+    // Draw white border
     val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         style = Paint.Style.STROKE
@@ -458,14 +465,15 @@ private fun createMarkerBitmap(): Bitmap {
     }
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, borderPaint)
 
-    // Draw "E" letter
+    // Draw category initial letter
     val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
-        textSize = 24f
+        textSize = 22f
         textAlign = Paint.Align.CENTER
         typeface = Typeface.DEFAULT_BOLD
     }
-    canvas.drawText("E", size / 2f, size / 2f + 8f, textPaint)
+    val textY = size / 2f - (textPaint.descent() + textPaint.ascent()) / 2f
+    canvas.drawText(letter, size / 2f, textY, textPaint)
 
     return bitmap
 }

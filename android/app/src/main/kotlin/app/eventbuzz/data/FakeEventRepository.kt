@@ -22,13 +22,13 @@ import kotlin.math.sqrt
 class FakeEventRepository @Inject constructor() : EventRepository {
 
     private val categories = listOf(
-        Category(1, "Music", "music", "#E91E63", "music_note"),
-        Category(2, "Sports", "sports", "#4CAF50", "sports"),
-        Category(3, "Food & Drink", "food-drink", "#FF9800", "restaurant"),
-        Category(4, "Arts", "arts", "#9C27B0", "palette"),
-        Category(5, "Tech", "tech", "#2196F3", "computer"),
-        Category(6, "Outdoor", "outdoor", "#8BC34A", "park"),
-        Category(7, "Community", "community", "#00BCD4", "groups"),
+        Category(1, "Music", "music", "#FF2D78", "music_note"),
+        Category(2, "Sports", "sports", "#00E676", "sports"),
+        Category(3, "Food & Drink", "food-drink", "#FF6D00", "restaurant"),
+        Category(4, "Arts", "arts", "#D500F9", "palette"),
+        Category(5, "Tech", "tech", "#2979FF", "computer"),
+        Category(6, "Outdoor", "outdoor", "#00E5FF", "park"),
+        Category(7, "Community", "community", "#FFEA00", "groups"),
     )
 
     private val now = Instant.now()
