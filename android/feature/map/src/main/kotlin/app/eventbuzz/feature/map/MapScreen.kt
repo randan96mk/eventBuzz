@@ -5,14 +5,18 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -22,12 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -45,8 +52,6 @@ import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.MapLibreMap
 
-private const val STYLE_URL = "https://demotiles.maplibre.org/style.json"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -56,6 +61,7 @@ fun MapScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val selectedEvent = (uiState as? MapUiState.Success)?.selectedEvent
+    val currentStyle = (uiState as? MapUiState.Success)?.mapStyle ?: MapStyle.LIBERTY
 
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
@@ -122,11 +128,45 @@ fun MapScreen(
                 }
 
                 is MapUiState.Success -> {
+                    // Map style selector overlay
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .zIndex(1f),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        MapStyle.entries.forEach { style ->
+                            FilterChip(
+                                selected = currentStyle == style,
+                                onClick = { viewModel.setMapStyle(style) },
+                                label = {
+                                    Text(
+                                        text = style.label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(
+                                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                    enabled = true,
+                                    selected = currentStyle == style,
+                                ),
+                            )
+                        }
+                    }
+
+                    // Map view
                     MapLibreView(
                         events = state.events,
+                        mapStyle = state.mapStyle,
                         centerLat = userLocation?.latitude ?: 40.7128,
                         centerLng = userLocation?.longitude ?: -74.0060,
                         onMarkerClick = { event -> viewModel.selectEvent(event) },
+                        onMapTap = { viewModel.selectEvent(null) },
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -138,9 +178,11 @@ fun MapScreen(
 @Composable
 private fun MapLibreView(
     events: List<Event>,
+    mapStyle: MapStyle,
     centerLat: Double,
     centerLng: Double,
     onMarkerClick: (Event) -> Unit,
+    onMapTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -152,13 +194,26 @@ private fun MapLibreView(
     val mapView = remember {
         MapView(context).apply {
             getMapAsync { map ->
-                map.setStyle(STYLE_URL)
+                map.setStyle(mapStyle.url)
                 map.cameraPosition = CameraPosition.Builder()
                     .target(LatLng(centerLat, centerLng))
                     .zoom(11.0)
                     .build()
             }
         }
+    }
+
+    // Track the current map reference for style changes
+    var mapRef by remember { mutableStateOf<MapLibreMap?>(null) }
+
+    // Store the map reference
+    LaunchedEffect(Unit) {
+        mapView.getMapAsync { map -> mapRef = map }
+    }
+
+    // Update style when it changes
+    LaunchedEffect(mapStyle) {
+        mapRef?.setStyle(mapStyle.url)
     }
 
     // Add markers when events change
@@ -169,20 +224,20 @@ private fun MapLibreView(
             val markerIcon = createMarkerBitmap()
             val icon = IconFactory.getInstance(context).fromBitmap(markerIcon)
 
-            val eventById = mutableMapOf<String, Event>()
+            val eventByTitle = mutableMapOf<String, Event>()
             events.forEach { event ->
-                val marker = map.addMarker(
+                map.addMarker(
                     MarkerOptions()
                         .position(LatLng(event.location.latitude, event.location.longitude))
                         .title(event.title)
                         .snippet(event.category.name)
                         .icon(icon)
                 )
-                eventById[event.title] = event
+                eventByTitle[event.title] = event
             }
 
             map.setOnMarkerClickListener { marker ->
-                val event = eventById[marker.title]
+                val event = eventByTitle[marker.title]
                 if (event != null) {
                     onMarkerClick(event)
                     map.animateCamera(
@@ -196,7 +251,7 @@ private fun MapLibreView(
             }
 
             map.addOnMapClickListener {
-                onMarkerClick(events.first()) // clear selection on map tap would need null
+                onMapTap()
                 false
             }
         }
@@ -234,7 +289,7 @@ private fun createMarkerBitmap(): Bitmap {
 
     // Draw circle
     val circlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#6750A4") // Material purple
+        color = Color.parseColor("#6750A4")
         style = Paint.Style.FILL
     }
     canvas.drawCircle(size / 2f, size / 2f, size / 2f - 2f, circlePaint)
