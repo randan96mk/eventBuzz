@@ -174,11 +174,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Positioned above the target marker */
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 120px;
-    width: 300px;
+    width: 280px;
+    /* Default position; overridden via inline style per marker */
   }
   .map-popup {
     background: var(--surface);
@@ -410,12 +407,12 @@
 
         <!-- Markers -->
         <div class="marker" style="top:55px;left:90px;">E</div>
-        <div class="marker" style="top:90px;left:200px;">E</div>
-        <div class="marker" style="top:130px;left:140px;">E</div>
+        <div class="marker" style="top:100px;left:200px;box-shadow:0 0 0 4px rgba(0,200,83,0.3),0 2px 8px rgba(0,0,0,0.25);">E</div>
+        <div class="marker" style="top:150px;left:140px;">E</div>
         <div class="marker" style="top:70px;left:270px;">E</div>
 
-        <!-- Popup card — positioned above marker with pointer -->
-        <div class="map-popup-wrapper">
+        <!-- Popup — aligned above the active marker (center x=218, top y=100) -->
+        <div class="map-popup-wrapper" style="left:218px;transform:translateX(-50%);bottom:168px;">
           <div class="map-popup">
             <div class="popup-img"></div>
             <div class="popup-info">
@@ -534,17 +531,17 @@
 
         <!-- Markers -->
         <div class="marker" style="top:55px;left:90px;">E</div>
-        <div class="marker" style="top:90px;left:200px;">E</div>
-        <div class="marker" style="top:130px;left:140px;">E</div>
+        <div class="marker" style="top:100px;left:200px;">E</div>
+        <div class="marker" style="top:140px;left:140px;box-shadow:0 0 0 4px rgba(0,230,118,0.35),0 2px 8px rgba(0,0,0,0.4);">E</div>
         <div class="marker" style="top:70px;left:270px;">E</div>
 
-        <!-- Popup card — positioned above marker with pointer -->
-        <div class="map-popup-wrapper">
+        <!-- Popup — aligned above the active marker (center x=158, top y=140) -->
+        <div class="map-popup-wrapper" style="left:158px;transform:translateX(-50%);bottom:128px;">
           <div class="map-popup">
             <div class="popup-img"></div>
             <div class="popup-info">
-              <div class="popup-title">Bangalore Music Fest</div>
-              <div class="popup-sub">MG Road, Bangalore</div>
+              <div class="popup-title">Innovation Summit</div>
+              <div class="popup-sub">Koramangala, Bangalore</div>
               <div class="popup-tap">Tap for details</div>
             </div>
             <div class="popup-close">&times;</div>
