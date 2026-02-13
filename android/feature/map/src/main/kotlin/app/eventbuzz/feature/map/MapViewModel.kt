@@ -43,6 +43,13 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    fun setMapStyle(style: MapStyle) {
+        val current = _uiState.value
+        if (current is MapUiState.Success) {
+            _uiState.value = current.copy(mapStyle = style)
+        }
+    }
+
     private fun loadEvents(location: Location) {
         viewModelScope.launch {
             _uiState.value = MapUiState.Loading
