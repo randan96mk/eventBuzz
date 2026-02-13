@@ -107,9 +107,8 @@ fun MapScreen(
             }
 
             is MapUiState.Success -> {
-                // Track marker screen position reported by MapLibreView
-                var markerScreenPos by remember { mutableStateOf(android.graphics.PointF(0f, 0f)) }
-                // Track the Box size so we can clamp the popup inside
+                // Track the Box size so we can position popup above center
+                // (animateCamera always centers the tapped marker on screen)
                 var boxSize by remember { mutableStateOf(IntSize.Zero) }
                 val density = LocalDensity.current
 
@@ -119,8 +118,7 @@ fun MapScreen(
                     mapStyle = state.mapStyle,
                     centerLat = userLocation?.latitude ?: 12.9716,
                     centerLng = userLocation?.longitude ?: 77.5946,
-                    onMarkerClick = { event, screenPos ->
-                        markerScreenPos = screenPos
+                    onMarkerClick = { event ->
                         viewModel.selectEvent(event)
                     },
                     onMapTap = { viewModel.selectEvent(null) },
@@ -171,21 +169,18 @@ fun MapScreen(
                         .zIndex(2f)
                         .onGloballyPositioned { popupSize = it.size }
                         .offset {
-                            // Place the popup so the pointer tip is at the marker position.
-                            // Pointer is centered horizontally and at the very bottom of the popup.
-                            val markerXPx = markerScreenPos.x.toInt()
-                            val markerYPx = markerScreenPos.y.toInt()
-                            val halfW = popupSize.width / 2
-                            val popupH = popupSize.height
-
-                            // Center popup horizontally on the marker, clamp to screen edges
-                            val x = (markerXPx - halfW)
-                                .coerceIn(0, (boxSize.width - popupSize.width).coerceAtLeast(0))
-                            // Position popup above marker with 8dp gap
+                            // animateCamera centers the tapped marker on screen,
+                            // so the marker lands at (boxCenter.x, boxCenter.y).
+                            // Position popup so its pointer tip sits just above the marker.
+                            val markerIconPx = 48 // marker bitmap size in px
                             val gapPx = with(density) { 8.dp.roundToPx() }
-                            val y = (markerYPx - popupH - gapPx).coerceAtLeast(0)
 
-                            IntOffset(x, y)
+                            // Center popup horizontally
+                            val x = (boxSize.width - popupSize.width) / 2
+                            // Place popup above the marker center
+                            val y = boxSize.height / 2 - markerIconPx / 2 - gapPx - popupSize.height
+
+                            IntOffset(x.coerceAtLeast(0), y.coerceAtLeast(0))
                         },
                 ) {
                     selectedEvent?.let { event ->
@@ -340,7 +335,7 @@ private fun MapLibreView(
     mapStyle: MapStyle,
     centerLat: Double,
     centerLng: Double,
-    onMarkerClick: (Event, android.graphics.PointF) -> Unit,
+    onMarkerClick: (Event) -> Unit,
     onMapTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -398,9 +393,7 @@ private fun MapLibreView(
             map.setOnMarkerClickListener { marker ->
                 val event = eventByTitle[marker.title]
                 if (event != null) {
-                    // Get the marker's screen position before animating
-                    val screenPos = map.projection.toScreenLocation(marker.position)
-                    onMarkerClick(event, screenPos)
+                    onMarkerClick(event)
                     map.animateCamera(
                         org.maplibre.android.camera.CameraUpdateFactory.newLatLngZoom(
                             LatLng(event.location.latitude, event.location.longitude),
