@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventBuzz — Emerald Pulse Theme Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+  h2.mode-label {
+    text-align: center;
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  /* ── Phone shell ── */
+  .phone {
+    width: 360px;
+    height: 740px;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Light theme tokens ── */
+  .phone.light {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-variant: #F4F7F6;
+    --primary: #00C853;
+    --primary-light: #00E676;
+    --on-primary: #fff;
+    --on-surface: #1B1F1B;
+    --on-surface-variant: #43524A;
+    --outline: #73857A;
+    --card-bg: #F4F7F6;
+    --chip-bg: #E8F5E9;
+    --chip-text: #00391B;
+    --nav-bg: #ffffff;
+    --nav-border: #eee;
+    --nav-inactive: #888;
+    --bubble: #00C853;
+    --bubble-light: #E8F5E9;
+  }
+
+  /* ── Dark theme tokens ── */
+  .phone.dark {
+    --bg: #0F2027;
+    --surface: #0F2027;
+    --surface-variant: #203A43;
+    --primary: #00E676;
+    --primary-light: #69F0AE;
+    --on-primary: #00391B;
+    --on-surface: #B9F6CA;
+    --on-surface-variant: #73857A;
+    --outline: #43524A;
+    --card-bg: #203A43;
+    --chip-bg: #2C5364;
+    --chip-text: #B9F6CA;
+    --nav-bg: #0F2027;
+    --nav-border: #203A43;
+    --nav-inactive: #73857A;
+    --bubble: #00E676;
+    --bubble-light: #203A43;
+  }
+
+  .phone-body {
+    flex: 1;
+    background: var(--bg);
+    overflow-y: auto;
+    padding-bottom: 64px;
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    height: 28px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--on-surface);
+  }
+
+  /* ── Map area ── */
+  .map-area {
+    height: 260px;
+    position: relative;
+    overflow: hidden;
+  }
+  .phone.light .map-area {
+    background: linear-gradient(145deg, #d4edda 0%, #c3e6cb 40%, #b8dacc 100%);
+  }
+  .phone.dark .map-area {
+    background: linear-gradient(145deg, #1a2e35 0%, #263f4a 40%, #1e3340 100%);
+  }
+  /* Fake map grid lines */
+  .map-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,200,83,0.08) 60px),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(0,200,83,0.08) 60px);
+  }
+
+  /* ── Map style chips ── */
+  .map-chips {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+  }
+  .map-chip {
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--outline);
+    background: var(--surface);
+    color: var(--on-surface-variant);
+    cursor: pointer;
+  }
+  .map-chip.active {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+  }
+
+  /* ── Map markers ── */
+  .marker {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bubble);
+    border: 3px solid #fff;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    z-index: 1;
+  }
+  .phone.dark .marker { color: #00391B; border-color: rgba(255,255,255,0.6); }
+
+  /* ── Event popup card on map ── */
+  .map-popup {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    display: flex;
+    gap: 10px;
+    z-index: 3;
+    border: 1px solid var(--outline);
+  }
+  .popup-img {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .phone.light .popup-img { background: linear-gradient(135deg, #00C853, #00E676); }
+  .phone.dark .popup-img { background: linear-gradient(135deg, #00693B, #00C853); }
+  .popup-info { flex: 1; }
+  .popup-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--on-surface);
+    margin-bottom: 2px;
+  }
+  .popup-sub {
+    font-size: 11px;
+    color: var(--on-surface-variant);
+  }
+  .popup-tap {
+    font-size: 11px;
+    color: var(--primary);
+    font-weight: 500;
+    margin-top: 4px;
+  }
+  .popup-close {
+    font-size: 16px;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    align-self: flex-start;
+    line-height: 1;
+  }
+
+  /* ── Section header ── */
+  .section-header {
+    padding: 16px 16px 8px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--on-surface);
+  }
+
+  /* ── Sort / filter chips ── */
+  .chip-row {
+    display: flex;
+    gap: 8px;
+    padding: 4px 16px 12px;
+    overflow-x: auto;
+  }
+  .chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .chip.outline {
+    background: transparent;
+    border: 1px solid var(--outline);
+    color: var(--on-surface-variant);
+  }
+  .chip.filled {
+    background: var(--chip-bg);
+    border: 1px solid transparent;
+    color: var(--chip-text);
+  }
+  .chip.primary {
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    color: var(--on-primary);
+  }
+
+  /* ── Event cards ── */
+  .event-card {
+    margin: 0 16px 12px;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    gap: 12px;
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+  .event-card:hover { transform: translateY(-2px); }
+  .card-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .card-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--on-surface);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-date {
+    font-size: 11px;
+    color: var(--on-surface-variant);
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .category-chip {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    color: #fff;
+  }
+  .cat-music { background: #E11D48; }
+  .cat-sports { background: #059669; }
+  .cat-food { background: #FF9800; }
+  .cat-arts { background: #7C3AED; }
+  .cat-tech { background: #2563EB; }
+  .cat-outdoor { background: #16A34A; }
+  .cat-community { background: #0891B2; }
+  .card-distance {
+    font-size: 10px;
+    color: var(--on-surface-variant);
+  }
+
+  /* Card image gradients (simulated event images) */
+  .img-concert { background: linear-gradient(135deg, #E11D48, #f472b6); }
+  .img-run { background: linear-gradient(135deg, #059669, #34d399); }
+  .img-food { background: linear-gradient(135deg, #FF9800, #fbbf24); }
+  .img-art { background: linear-gradient(135deg, #7C3AED, #a78bfa); }
+  .img-tech { background: linear-gradient(135deg, #2563EB, #60a5fa); }
+
+  /* ── Bottom nav ── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--nav-bg);
+    border-top: 1px solid var(--nav-border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 10;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--nav-inactive);
+    cursor: pointer;
+  }
+  .nav-item.active {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 800px) {
+    body { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     LIGHT MODE — Map + Events View
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div>
+  <h2 class="mode-label">Light Mode</h2>
+  <div class="phone light">
+    <div class="phone-body">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <span style="font-size:10px;">EventBuzz</span>
+        <span>100%</span>
+      </div>
+
+      <!-- Map -->
+      <div class="map-area">
+        <div class="map-chips">
+          <div class="map-chip active">Liberty</div>
+          <div class="map-chip">Bright</div>
+          <div class="map-chip">Dark</div>
+          <div class="map-chip">Positron</div>
+        </div>
+
+        <!-- Markers -->
+        <div class="marker" style="top:55px;left:90px;">E</div>
+        <div class="marker" style="top:90px;left:200px;">E</div>
+        <div class="marker" style="top:130px;left:140px;">E</div>
+        <div class="marker" style="top:70px;left:270px;">E</div>
+
+        <!-- Popup card -->
+        <div class="map-popup">
+          <div class="popup-img"></div>
+          <div class="popup-info">
+            <div class="popup-title">Bangalore Music Fest</div>
+            <div class="popup-sub">MG Road, Bangalore</div>
+            <div class="popup-tap">Tap for details</div>
+          </div>
+          <div class="popup-close">&times;</div>
+        </div>
+      </div>
+
+      <!-- Nearby Events -->
+      <div class="section-header">Nearby Events</div>
+      <div class="chip-row">
+        <div class="chip primary">Distance</div>
+        <div class="chip outline">Date</div>
+        <div class="chip outline">Popular</div>
+      </div>
+
+      <!-- Cards -->
+      <div class="event-card">
+        <div class="card-img img-concert"></div>
+        <div class="card-info">
+          <div class="card-title">Bangalore Music Festival 2026</div>
+          <div class="card-date">Feb 20, 2026 &bull; 6:00 PM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-music">Music</span>
+            <span class="card-distance">2.3 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="card-img img-tech"></div>
+        <div class="card-info">
+          <div class="card-title">Innovation Summit &mdash; AI &amp; Beyond</div>
+          <div class="card-date">Feb 22, 2026 &bull; 10:00 AM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-tech">Tech</span>
+            <span class="card-distance">4.1 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="card-img img-food"></div>
+        <div class="card-info">
+          <div class="card-title">Street Food Carnival</div>
+          <div class="card-date">Feb 25, 2026 &bull; 11:00 AM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-food">Food &amp; Drink</span>
+            <span class="card-distance">1.8 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="card-img img-run"></div>
+        <div class="card-info">
+          <div class="card-title">Cubbon Park Morning Run</div>
+          <div class="card-date">Mar 1, 2026 &bull; 6:30 AM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-sports">Sports</span>
+            <span class="card-distance">3.5 km</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg></div>
+        <span>Map</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg></div>
+        <span>Events</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+        <span>Search</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     DARK MODE — Map + Events View
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div>
+  <h2 class="mode-label">Dark Mode</h2>
+  <div class="phone dark">
+    <div class="phone-body">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>9:41</span>
+        <span style="font-size:10px;">EventBuzz</span>
+        <span>100%</span>
+      </div>
+
+      <!-- Map -->
+      <div class="map-area">
+        <div class="map-chips">
+          <div class="map-chip active">Liberty</div>
+          <div class="map-chip">Bright</div>
+          <div class="map-chip">Dark</div>
+          <div class="map-chip">Positron</div>
+        </div>
+
+        <!-- Markers -->
+        <div class="marker" style="top:55px;left:90px;">E</div>
+        <div class="marker" style="top:90px;left:200px;">E</div>
+        <div class="marker" style="top:130px;left:140px;">E</div>
+        <div class="marker" style="top:70px;left:270px;">E</div>
+
+        <!-- Popup card -->
+        <div class="map-popup">
+          <div class="popup-img"></div>
+          <div class="popup-info">
+            <div class="popup-title">Bangalore Music Fest</div>
+            <div class="popup-sub">MG Road, Bangalore</div>
+            <div class="popup-tap">Tap for details</div>
+          </div>
+          <div class="popup-close">&times;</div>
+        </div>
+      </div>
+
+      <!-- Nearby Events -->
+      <div class="section-header">Nearby Events</div>
+      <div class="chip-row">
+        <div class="chip primary">Distance</div>
+        <div class="chip outline">Date</div>
+        <div class="chip outline">Popular</div>
+      </div>
+
+      <!-- Cards -->
+      <div class="event-card">
+        <div class="card-img img-concert"></div>
+        <div class="card-info">
+          <div class="card-title">Bangalore Music Festival 2026</div>
+          <div class="card-date">Feb 20, 2026 &bull; 6:00 PM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-music">Music</span>
+            <span class="card-distance">2.3 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="card-img img-tech"></div>
+        <div class="card-info">
+          <div class="card-title">Innovation Summit &mdash; AI &amp; Beyond</div>
+          <div class="card-date">Feb 22, 2026 &bull; 10:00 AM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-tech">Tech</span>
+            <span class="card-distance">4.1 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="card-img img-food"></div>
+        <div class="card-info">
+          <div class="card-title">Street Food Carnival</div>
+          <div class="card-date">Feb 25, 2026 &bull; 11:00 AM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-food">Food &amp; Drink</span>
+            <span class="card-distance">1.8 km</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="card-img img-art"></div>
+        <div class="card-info">
+          <div class="card-title">Contemporary Art Exhibition</div>
+          <div class="card-date">Mar 3, 2026 &bull; 11:00 AM</div>
+          <div class="card-meta">
+            <span class="category-chip cat-arts">Arts</span>
+            <span class="card-distance">5.2 km</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg></div>
+        <span>Map</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg></div>
+        <span>Events</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+        <span>Search</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
