@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventBuzz — Theme Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',system-ui,sans-serif; background:#111; color:#fff; padding:24px; }
+h1 { text-align:center; font-size:28px; margin-bottom:8px; }
+.subtitle { text-align:center; color:#aaa; margin-bottom:32px; font-size:14px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; max-width:1200px; margin:0 auto; }
+@media(max-width:900px){.grid{grid-template-columns:1fr;max-width:420px;}}
+.option { border-radius:16px; overflow:hidden; border:3px solid transparent; cursor:pointer; transition:border .2s,transform .2s; }
+.option:hover { transform:translateY(-4px); }
+.option.selected { border-color:#FFD700; }
+.option-header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; }
+.option-header h2 { font-size:18px; font-weight:700; }
+.option-header .badge { font-size:11px; padding:4px 10px; border-radius:99px; font-weight:600; }
+
+/* Phone mockup */
+.phone { width:100%; aspect-ratio:9/17; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+
+/* Status bar */
+.status-bar { height:28px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:600; flex-shrink:0; }
+
+/* App header */
+.app-header { padding:12px 16px 8px; display:flex; align-items:center; justify-content:space-between; }
+.app-header h3 { font-size:20px; font-weight:700; }
+.search-icon { width:20px; height:20px; opacity:.6; }
+
+/* Map area */
+.map-area { height:180px; position:relative; overflow:hidden; }
+.map-area img { display:none; }
+.map-placeholder { width:100%; height:100%; }
+.style-chips { position:absolute; top:8px; left:8px; display:flex; gap:4px; }
+.style-chip { font-size:9px; padding:3px 8px; border-radius:12px; font-weight:600; border:1px solid; }
+.map-popup { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:85%; border-radius:12px; padding:10px; display:flex; gap:8px; align-items:center; }
+.popup-img { width:48px; height:48px; border-radius:8px; flex-shrink:0; }
+.popup-title { font-size:12px; font-weight:600; line-height:1.3; }
+.popup-meta { font-size:9px; opacity:.7; margin-top:2px; }
+.popup-chip { font-size:8px; padding:2px 6px; border-radius:6px; display:inline-block; margin-top:3px; font-weight:600; }
+.popup-close { position:absolute; top:6px; right:8px; font-size:14px; cursor:pointer; opacity:.5; }
+
+/* Event cards */
+.event-list { padding:8px 12px; display:flex; flex-direction:column; gap:8px; flex:1; overflow:hidden; }
+.event-card { border-radius:10px; padding:10px; display:flex; gap:10px; align-items:center; }
+.event-thumb { width:52px; height:52px; border-radius:8px; flex-shrink:0; }
+.event-info { flex:1; min-width:0; }
+.event-title { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.event-date { font-size:9px; opacity:.6; margin-top:2px; }
+.event-cat { font-size:8px; padding:2px 6px; border-radius:6px; display:inline-block; margin-top:3px; font-weight:600; }
+
+/* Bottom nav */
+.bottom-nav { height:52px; display:flex; align-items:center; justify-content:space-around; border-top:1px solid; flex-shrink:0; }
+.nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; font-weight:500; opacity:.5; }
+.nav-item.active { opacity:1; }
+.nav-icon { width:18px; height:18px; border-radius:4px; }
+
+/* ================================ */
+/* OPTION A — Sunset Coral */
+/* ================================ */
+.optA .option-header { background:linear-gradient(135deg,#FF6B6B,#FF8E53); }
+.optA .badge { background:rgba(255,255,255,.25); color:#fff; }
+.optA .phone { background:#FFFAF7; color:#2D1B12; }
+.optA .status-bar { background:#FF6B6B; color:#fff; }
+.optA .app-header { background:#FFFAF7; }
+.optA .app-header h3 { color:#C62828; }
+.optA .map-placeholder { background:linear-gradient(180deg,#E8F5E9 0%,#C8E6C9 50%,#A5D6A7 100%); }
+.optA .style-chip { background:rgba(255,255,255,.9); color:#C62828; border-color:rgba(198,40,40,.2); }
+.optA .style-chip.active { background:#FF6B6B; color:#fff; border-color:#FF6B6B; }
+.optA .map-popup { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.15); color:#2D1B12; }
+.optA .popup-img { background:linear-gradient(135deg,#FFCDD2,#EF9A9A); }
+.optA .popup-chip { background:#FFEBEE; color:#C62828; }
+.optA .event-card { background:#FFF3EE; }
+.optA .event-thumb { background:linear-gradient(135deg,#FFCCBC,#FFAB91); }
+.optA .event-cat { background:#FFEBEE; color:#C62828; }
+.optA .bottom-nav { background:#FFFAF7; border-color:#FFE0D0; }
+.optA .nav-item.active { color:#FF6B6B; }
+.optA .nav-icon { background:#FFE0D0; }
+.optA .nav-item.active .nav-icon { background:#FF6B6B; }
+
+/* ================================ */
+/* OPTION B — Ocean Teal */
+/* ================================ */
+.optB .option-header { background:linear-gradient(135deg,#00897B,#26A69A); }
+.optB .badge { background:rgba(255,255,255,.25); color:#fff; }
+.optB .phone { background:#F0FDFA; color:#0F2B26; }
+.optB .status-bar { background:#00796B; color:#fff; }
+.optB .app-header { background:#F0FDFA; }
+.optB .app-header h3 { color:#00695C; }
+.optB .map-placeholder { background:linear-gradient(180deg,#E0F2F1 0%,#B2DFDB 50%,#80CBC4 100%); }
+.optB .style-chip { background:rgba(255,255,255,.9); color:#00695C; border-color:rgba(0,105,92,.2); }
+.optB .style-chip.active { background:#00897B; color:#fff; border-color:#00897B; }
+.optB .map-popup { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.15); color:#0F2B26; }
+.optB .popup-img { background:linear-gradient(135deg,#B2DFDB,#80CBC4); }
+.optB .popup-chip { background:#E0F2F1; color:#00695C; }
+.optB .event-card { background:#E0F7F4; }
+.optB .event-thumb { background:linear-gradient(135deg,#B2DFDB,#4DB6AC); }
+.optB .event-cat { background:#E0F2F1; color:#00695C; }
+.optB .bottom-nav { background:#F0FDFA; border-color:#B2DFDB; }
+.optB .nav-item.active { color:#00897B; }
+.optB .nav-icon { background:#B2DFDB; }
+.optB .nav-item.active .nav-icon { background:#00897B; }
+
+/* ================================ */
+/* OPTION C — Midnight Indigo */
+/* ================================ */
+.optC .option-header { background:linear-gradient(135deg,#1A237E,#3949AB); }
+.optC .badge { background:rgba(255,255,255,.2); color:#C5CAE9; }
+.optC .phone { background:#0D1117; color:#E8EAED; }
+.optC .status-bar { background:#0D1117; color:#8899AA; }
+.optC .app-header { background:#0D1117; }
+.optC .app-header h3 { color:#7C8DFF; }
+.optC .map-placeholder { background:linear-gradient(180deg,#1A1E2E 0%,#252B3F 50%,#303850 100%); }
+.optC .style-chip { background:rgba(30,36,56,.9); color:#9FA8DA; border-color:rgba(159,168,218,.3); }
+.optC .style-chip.active { background:#3949AB; color:#fff; border-color:#3949AB; }
+.optC .map-popup { background:#1C2333; box-shadow:0 4px 24px rgba(0,0,0,.5); color:#E8EAED; border:1px solid #2D3548; }
+.optC .popup-img { background:linear-gradient(135deg,#283593,#3F51B5); }
+.optC .popup-chip { background:#1A237E; color:#9FA8DA; }
+.optC .event-card { background:#161B27; border:1px solid #2D3548; }
+.optC .event-thumb { background:linear-gradient(135deg,#1A237E,#3949AB); }
+.optC .event-cat { background:#1A237E; color:#9FA8DA; }
+.optC .bottom-nav { background:#0D1117; border-color:#1E2536; }
+.optC .nav-item { color:#6B7A8D; }
+.optC .nav-item.active { color:#7C8DFF; }
+.optC .nav-icon { background:#1E2536; }
+.optC .nav-item.active .nav-icon { background:#3949AB; }
+
+/* ================================ */
+/* OPTION D — Saffron Gold */
+/* ================================ */
+.optD .option-header { background:linear-gradient(135deg,#F57F17,#FFB300); }
+.optD .badge { background:rgba(0,0,0,.15); color:#4E2A00; }
+.optD .phone { background:#FFFDE7; color:#3E2723; }
+.optD .status-bar { background:#F57F17; color:#fff; }
+.optD .app-header { background:#FFFDE7; }
+.optD .app-header h3 { color:#E65100; }
+.optD .map-placeholder { background:linear-gradient(180deg,#FFF9C4 0%,#FFF176 30%,#E8F5E9 60%,#C8E6C9 100%); }
+.optD .style-chip { background:rgba(255,255,255,.9); color:#E65100; border-color:rgba(230,81,0,.2); }
+.optD .style-chip.active { background:#F57F17; color:#fff; border-color:#F57F17; }
+.optD .map-popup { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.12); color:#3E2723; }
+.optD .popup-img { background:linear-gradient(135deg,#FFE082,#FFB300); }
+.optD .popup-chip { background:#FFF8E1; color:#E65100; }
+.optD .event-card { background:#FFF8E1; }
+.optD .event-thumb { background:linear-gradient(135deg,#FFECB3,#FFB300); }
+.optD .event-cat { background:#FFF8E1; color:#E65100; }
+.optD .bottom-nav { background:#FFFDE7; border-color:#FFE082; }
+.optD .nav-item.active { color:#F57F17; }
+.optD .nav-icon { background:#FFE082; }
+.optD .nav-item.active .nav-icon { background:#F57F17; }
+
+/* Marker dots on map */
+.marker { position:absolute; width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.3); }
+.optA .marker { background:#FF6B6B; }
+.optB .marker { background:#00897B; }
+.optC .marker { background:#5C6BC0; }
+.optD .marker { background:#F57F17; }
+</style>
+</head>
+<body>
+
+<h1>EventBuzz Theme Options</h1>
+<p class="subtitle">Pick a theme for the app. Each preview shows the Map screen with an event popup.</p>
+
+<div class="grid">
+
+<!-- ============ OPTION A — Sunset Coral ============ -->
+<div class="option optA" onclick="select(this)">
+  <div class="option-header">
+    <h2>A — Sunset Coral</h2>
+    <span class="badge">WARM &amp; VIBRANT</span>
+  </div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="map-area">
+      <div class="map-placeholder"></div>
+      <div class="style-chips">
+        <div class="style-chip active">Liberty</div>
+        <div class="style-chip">Bright</div>
+        <div class="style-chip">Dark</div>
+      </div>
+      <div class="marker" style="top:30%;left:40%"></div>
+      <div class="marker" style="top:55%;left:65%"></div>
+      <div class="marker" style="top:45%;left:50%"></div>
+      <div class="map-popup">
+        <div class="popup-img"></div>
+        <div>
+          <div class="popup-title">Bangalore Jazz Festival</div>
+          <div class="popup-meta">Jayamahal Palace, Palace Rd</div>
+          <span class="popup-chip">Music</span> <span class="popup-meta" style="margin-left:4px">2 km</span>
+        </div>
+        <span class="popup-close">&times;</span>
+      </div>
+    </div>
+    <div class="event-list">
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">Cubbon Park Morning Run</div>
+          <div class="event-date">Tomorrow &middot; 6:00 AM</div>
+          <span class="event-cat">Sports</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">VV Puram Food Street Walk</div>
+          <div class="event-date">Sat, Feb 15 &middot; 5:30 PM</div>
+          <span class="event-cat">Food</span>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
+      <div class="nav-item"><div class="nav-icon"></div>List</div>
+      <div class="nav-item"><div class="nav-icon"></div>Search</div>
+      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ OPTION B — Ocean Teal ============ -->
+<div class="option optB" onclick="select(this)">
+  <div class="option-header">
+    <h2>B — Ocean Teal</h2>
+    <span class="badge">CALM &amp; FRESH</span>
+  </div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="map-area">
+      <div class="map-placeholder"></div>
+      <div class="style-chips">
+        <div class="style-chip active">Liberty</div>
+        <div class="style-chip">Bright</div>
+        <div class="style-chip">Dark</div>
+      </div>
+      <div class="marker" style="top:35%;left:45%"></div>
+      <div class="marker" style="top:60%;left:55%"></div>
+      <div class="marker" style="top:42%;left:52%"></div>
+      <div class="map-popup">
+        <div class="popup-img"></div>
+        <div>
+          <div class="popup-title">Indie Music Night at Fandom</div>
+          <div class="popup-meta">Fandom at Gilly's, Koramangala</div>
+          <span class="popup-chip">Music</span> <span class="popup-meta" style="margin-left:4px">4 km</span>
+        </div>
+        <span class="popup-close">&times;</span>
+      </div>
+    </div>
+    <div class="event-list">
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">Craft Beer Crawl</div>
+          <div class="event-date">Fri, Feb 14 &middot; 7:00 PM</div>
+          <span class="event-cat">Food</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">Android Dev Meetup</div>
+          <div class="event-date">Wed, Feb 19 &middot; 6:30 PM</div>
+          <span class="event-cat">Tech</span>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
+      <div class="nav-item"><div class="nav-icon"></div>List</div>
+      <div class="nav-item"><div class="nav-icon"></div>Search</div>
+      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ OPTION C — Midnight Indigo ============ -->
+<div class="option optC" onclick="select(this)">
+  <div class="option-header">
+    <h2>C — Midnight Indigo</h2>
+    <span class="badge">DARK &amp; SLEEK</span>
+  </div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="map-area">
+      <div class="map-placeholder"></div>
+      <div class="style-chips">
+        <div class="style-chip">Liberty</div>
+        <div class="style-chip">Bright</div>
+        <div class="style-chip active">Dark</div>
+      </div>
+      <div class="marker" style="top:33%;left:38%"></div>
+      <div class="marker" style="top:58%;left:62%"></div>
+      <div class="marker" style="top:48%;left:48%"></div>
+      <div class="map-popup">
+        <div class="popup-img"></div>
+        <div>
+          <div class="popup-title">AI/ML Conference Bangalore</div>
+          <div class="popup-meta">NIMHANS Convention Centre</div>
+          <span class="popup-chip">Tech</span> <span class="popup-meta" style="margin-left:4px">6 km</span>
+        </div>
+        <span class="popup-close">&times;</span>
+      </div>
+    </div>
+    <div class="event-list">
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">Nandi Hills Sunrise Trek</div>
+          <div class="event-date">Sun, Feb 16 &middot; 4:30 AM</div>
+          <span class="event-cat">Outdoor</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">Bangalore Comic Con</div>
+          <div class="event-date">Mar 1-2 &middot; 10:00 AM</div>
+          <span class="event-cat">Community</span>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
+      <div class="nav-item"><div class="nav-icon"></div>List</div>
+      <div class="nav-item"><div class="nav-icon"></div>Search</div>
+      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ OPTION D — Saffron Gold ============ -->
+<div class="option optD" onclick="select(this)">
+  <div class="option-header">
+    <h2>D — Saffron Gold</h2>
+    <span class="badge">BOLD &amp; FESTIVE</span>
+  </div>
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>100%</span></div>
+    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="map-area">
+      <div class="map-placeholder"></div>
+      <div class="style-chips">
+        <div class="style-chip active">Liberty</div>
+        <div class="style-chip">Bright</div>
+        <div class="style-chip">Positron</div>
+      </div>
+      <div class="marker" style="top:32%;left:42%"></div>
+      <div class="marker" style="top:56%;left:58%"></div>
+      <div class="marker" style="top:44%;left:46%"></div>
+      <div class="map-popup">
+        <div class="popup-img"></div>
+        <div>
+          <div class="popup-title">Rangoli Art Exhibition</div>
+          <div class="popup-meta">Karnataka Chitrakala Parishath</div>
+          <span class="popup-chip">Arts</span> <span class="popup-meta" style="margin-left:4px">3 km</span>
+        </div>
+        <span class="popup-close">&times;</span>
+      </div>
+    </div>
+    <div class="event-list">
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">Startup Pitch Night</div>
+          <div class="event-date">Thu, Feb 14 &middot; 7:00 PM</div>
+          <span class="event-cat">Tech</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-thumb"></div>
+        <div class="event-info">
+          <div class="event-title">South Indian Cooking Class</div>
+          <div class="event-date">Sat, Feb 22 &middot; 11:00 AM</div>
+          <span class="event-cat">Food</span>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
+      <div class="nav-item"><div class="nav-icon"></div>List</div>
+      <div class="nav-item"><div class="nav-icon"></div>Search</div>
+      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- grid -->
+
+<div id="selection" style="text-align:center;margin-top:32px;font-size:16px;color:#888;min-height:40px;"></div>
+
+<script>
+function select(el) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const name = el.querySelector('h2').textContent;
+  document.getElementById('selection').innerHTML =
+    '<span style="color:#FFD700;font-weight:700;">Selected: ' + name + '</span>';
+}
+</script>
+
+</body>
+</html>
