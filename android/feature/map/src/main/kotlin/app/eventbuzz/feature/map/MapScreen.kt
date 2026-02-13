@@ -44,6 +44,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -142,14 +145,15 @@ fun MapScreen(
                     }
                 }
 
-                // Event popup card overlay — centered on map above the marker
+                // Event popup card overlay — positioned above the marker
                 AnimatedVisibility(
                     visible = selectedEvent != null,
                     enter = fadeIn() + scaleIn(initialScale = 0.8f),
                     exit = fadeOut() + scaleOut(targetScale = 0.8f),
                     modifier = Modifier
-                        .align(Alignment.Center)
+                        .align(Alignment.BottomCenter)
                         .padding(horizontal = 24.dp)
+                        .padding(bottom = 48.dp)
                         .zIndex(2f),
                 ) {
                     selectedEvent?.let { event ->
@@ -171,108 +175,130 @@ private fun EventPopupCard(
     onTap: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onTap),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+    val surfaceColor = MaterialTheme.colorScheme.surface
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            // Header row: title + close button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Top,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = event.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    event.address?.let { addr ->
-                        Spacer(modifier = Modifier.height(2.dp))
+        // Card body
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onTap),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = surfaceColor,
+            ),
+        ) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                // Header row: title + close button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = addr,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
+                            text = event.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
-                    }
-                }
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.size(32.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Image + details row
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (event.imageUrl != null) {
-                    AsyncImage(
-                        model = event.imageUrl,
-                        contentDescription = event.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(MaterialTheme.shapes.medium),
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                }
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        AssistChip(
-                            onClick = {},
-                            label = {
-                                Text(
-                                    text = event.category.name,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            },
-                        )
-                        event.distanceMeters?.let { dist ->
+                        event.address?.let { addr ->
+                            Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "${(dist / 1000).toInt()} km",
+                                text = addr,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = event.startDate.toString().substringBefore("T"),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    IconButton(
+                        onClick = onDismiss,
+                        modifier = Modifier.size(32.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Image + details row
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (event.imageUrl != null) {
+                        AsyncImage(
+                            model = event.imageUrl,
+                            contentDescription = event.title,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(MaterialTheme.shapes.medium),
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                    }
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            AssistChip(
+                                onClick = {},
+                                label = {
+                                    Text(
+                                        text = event.category.name,
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                },
+                            )
+                            event.distanceMeters?.let { dist ->
+                                Text(
+                                    text = "${(dist / 1000).toInt()} km",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = event.startDate.toString().substringBefore("T"),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Tap for details",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Tap for details",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
         }
+
+        // Pointer triangle pointing down toward the marker
+        Spacer(
+            modifier = Modifier
+                .size(width = 24.dp, height = 12.dp)
+                .drawBehind {
+                    val path = Path().apply {
+                        moveTo(0f, 0f)
+                        lineTo(size.width, 0f)
+                        lineTo(size.width / 2f, size.height)
+                        close()
+                    }
+                    drawPath(path, color = surfaceColor)
+                },
+        )
     }
 }
 
