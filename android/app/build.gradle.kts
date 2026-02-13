@@ -10,6 +10,7 @@ plugins {
 android {
     namespace = "app.eventbuzz"
     compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "app.eventbuzz"
