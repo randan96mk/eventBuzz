@@ -22,7 +22,7 @@ data class SearchUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val selectedCategory: String? = null,
-    val distanceKm: Int = 5,
+    val distanceKm: Int = 50,
 )
 
 @HiltViewModel

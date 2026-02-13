@@ -6,7 +6,7 @@ data class EventFilter(
     val categorySlug: String? = null,
     val dateFrom: Instant? = null,
     val dateTo: Instant? = null,
-    val radiusMeters: Int = 5000,
+    val radiusMeters: Int = 50000,
     val query: String? = null,
     val sortBy: SortOption = SortOption.DISTANCE,
 )
