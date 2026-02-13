@@ -3,405 +3,569 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EventBuzz — Theme Options</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>EventBuzz — Modern Theme Options V2</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Inter',system-ui,sans-serif; background:#111; color:#fff; padding:24px; }
-h1 { text-align:center; font-size:28px; margin-bottom:8px; }
-.subtitle { text-align:center; color:#aaa; margin-bottom:32px; font-size:14px; }
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; max-width:1200px; margin:0 auto; }
-@media(max-width:900px){.grid{grid-template-columns:1fr;max-width:420px;}}
-.option { border-radius:16px; overflow:hidden; border:3px solid transparent; cursor:pointer; transition:border .2s,transform .2s; }
-.option:hover { transform:translateY(-4px); }
-.option.selected { border-color:#FFD700; }
-.option-header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; }
-.option-header h2 { font-size:18px; font-weight:700; }
-.option-header .badge { font-size:11px; padding:4px 10px; border-radius:99px; font-weight:600; }
+:root {
+  --page-bg: #0A0A0F;
+  --page-text: #F0F0F5;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--page-bg);color:var(--page-text);padding:32px 24px;min-height:100vh;}
 
-/* Phone mockup */
-.phone { width:100%; aspect-ratio:9/17; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+/* Header */
+.page-header{text-align:center;margin-bottom:40px;}
+.page-header h1{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:800;background:linear-gradient(135deg,#A78BFA,#F472B6,#FB923C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+.page-header p{color:#6B7280;font-size:14px;max-width:480px;margin:0 auto;}
 
-/* Status bar */
-.status-bar { height:28px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; font-size:11px; font-weight:600; flex-shrink:0; }
+/* Toggle */
+.mode-toggle{display:flex;justify-content:center;gap:8px;margin-bottom:36px;}
+.mode-btn{padding:8px 20px;border-radius:99px;border:1px solid #2D2D3A;background:transparent;color:#9CA3AF;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.mode-btn.active{background:#fff;color:#0A0A0F;border-color:#fff;}
 
-/* App header */
-.app-header { padding:12px 16px 8px; display:flex; align-items:center; justify-content:space-between; }
-.app-header h3 { font-size:20px; font-weight:700; }
-.search-icon { width:20px; height:20px; opacity:.6; }
+/* Grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:1100px;margin:0 auto;}
+@media(max-width:950px){.grid{grid-template-columns:1fr;max-width:400px;}}
 
-/* Map area */
-.map-area { height:180px; position:relative; overflow:hidden; }
-.map-area img { display:none; }
-.map-placeholder { width:100%; height:100%; }
-.style-chips { position:absolute; top:8px; left:8px; display:flex; gap:4px; }
-.style-chip { font-size:9px; padding:3px 8px; border-radius:12px; font-weight:600; border:1px solid; }
-.map-popup { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:85%; border-radius:12px; padding:10px; display:flex; gap:8px; align-items:center; }
-.popup-img { width:48px; height:48px; border-radius:8px; flex-shrink:0; }
-.popup-title { font-size:12px; font-weight:600; line-height:1.3; }
-.popup-meta { font-size:9px; opacity:.7; margin-top:2px; }
-.popup-chip { font-size:8px; padding:2px 6px; border-radius:6px; display:inline-block; margin-top:3px; font-weight:600; }
-.popup-close { position:absolute; top:6px; right:8px; font-size:14px; cursor:pointer; opacity:.5; }
+/* Card wrapper */
+.option{border-radius:20px;overflow:hidden;border:2px solid #1E1E2E;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;}
+.option:hover{transform:translateY(-6px);border-color:#3D3D50;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.option.selected{border-color:#A78BFA;box-shadow:0 0 0 1px #A78BFA,0 20px 60px rgba(167,139,250,.15);}
 
-/* Event cards */
-.event-list { padding:8px 12px; display:flex; flex-direction:column; gap:8px; flex:1; overflow:hidden; }
-.event-card { border-radius:10px; padding:10px; display:flex; gap:10px; align-items:center; }
-.event-thumb { width:52px; height:52px; border-radius:8px; flex-shrink:0; }
-.event-info { flex:1; min-width:0; }
-.event-title { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.event-date { font-size:9px; opacity:.6; margin-top:2px; }
-.event-cat { font-size:8px; padding:2px 6px; border-radius:6px; display:inline-block; margin-top:3px; font-weight:600; }
+/* Option header */
+.opt-head{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
+.opt-head::before{content:'';position:absolute;inset:0;opacity:.15;background:inherit;}
+.opt-head h2{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;position:relative;z-index:1;}
+.opt-head .tag{font-size:10px;padding:4px 10px;border-radius:99px;font-weight:700;letter-spacing:.5px;position:relative;z-index:1;text-transform:uppercase;}
+
+/* Phone frame */
+.phone{width:100%;aspect-ratio:9/17.5;display:flex;flex-direction:column;overflow:hidden;position:relative;}
+
+/* Dynamic island / status bar */
+.notch{height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:11px;font-weight:600;position:relative;}
+.notch::after{content:'';position:absolute;left:50%;top:8px;transform:translateX(-50%);width:80px;height:18px;border-radius:99px;background:rgba(0,0,0,.6);}
+
+/* App bar */
+.app-bar{padding:8px 16px 10px;display:flex;align-items:center;justify-content:space-between;}
+.app-bar h3{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.3px;}
+.app-bar-icons{display:flex;gap:8px;}
+.app-bar-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* Map */
+.map-area{flex:1;position:relative;min-height:150px;overflow:hidden;}
+.map-bg{width:100%;height:100%;position:absolute;inset:0;}
+
+/* Glassmorphism chips */
+.chips{position:absolute;top:10px;left:10px;display:flex;gap:5px;z-index:2;}
+.chip{font-size:9px;padding:4px 10px;border-radius:99px;font-weight:700;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid;transition:all .2s;}
+
+/* Map markers */
+.pin{position:absolute;z-index:1;}
+.pin-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);position:relative;}
+.pin-dot::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid;}
+.pin-pulse{position:absolute;inset:-4px;border-radius:50%;opacity:.3;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.3;}50%{transform:scale(1.4);opacity:0;}}
+
+/* Event popup — glassmorphism */
+.popup{position:absolute;left:50%;top:50%;transform:translate(-50%,-46%);width:88%;border-radius:16px;padding:14px;z-index:3;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid;box-shadow:0 8px 32px rgba(0,0,0,.25);}
+.popup-row{display:flex;gap:10px;align-items:center;}
+.popup-thumb{width:52px;height:52px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.popup-body{flex:1;min-width:0;}
+.popup-title{font-size:13px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.popup-addr{font-size:9px;opacity:.6;margin-top:1px;}
+.popup-tags{display:flex;gap:4px;align-items:center;margin-top:5px;}
+.popup-tag{font-size:8px;padding:2px 7px;border-radius:6px;font-weight:700;}
+.popup-dist{font-size:9px;opacity:.5;}
+.popup-x{position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;}
+.popup-cta{margin-top:10px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.3px;opacity:.8;}
+
+/* Event list section */
+.list-section{padding:10px 12px 6px;}
+.list-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.4;margin-bottom:8px;padding-left:2px;}
+.cards{display:flex;flex-direction:column;gap:6px;}
+.ecard{border-radius:14px;padding:10px;display:flex;gap:10px;align-items:center;transition:all .15s;}
+.ecard-img{width:48px;height:48px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ecard-body{flex:1;min-width:0;}
+.ecard-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ecard-sub{font-size:9px;opacity:.5;margin-top:1px;}
+.ecard-row{display:flex;gap:4px;align-items:center;margin-top:4px;}
+.ecard-chip{font-size:7px;padding:2px 6px;border-radius:5px;font-weight:700;}
+.ecard-price{font-size:9px;font-weight:700;margin-left:auto;}
 
 /* Bottom nav */
-.bottom-nav { height:52px; display:flex; align-items:center; justify-content:space-around; border-top:1px solid; flex-shrink:0; }
-.nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; font-weight:500; opacity:.5; }
-.nav-item.active { opacity:1; }
-.nav-icon { width:18px; height:18px; border-radius:4px; }
+.bnav{height:56px;display:flex;align-items:center;justify-content:space-around;border-top:1px solid;flex-shrink:0;padding:0 8px;}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9px;font-weight:600;opacity:.35;transition:all .2s;position:relative;}
+.bnav-item.active{opacity:1;}
+.bnav-ico{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;position:relative;}
+.bnav-item.active .bnav-ico::before{content:'';position:absolute;inset:-3px;border-radius:10px;opacity:.15;}
 
-/* ================================ */
-/* OPTION A — Sunset Coral */
-/* ================================ */
-.optA .option-header { background:linear-gradient(135deg,#FF6B6B,#FF8E53); }
-.optA .badge { background:rgba(255,255,255,.25); color:#fff; }
-.optA .phone { background:#FFFAF7; color:#2D1B12; }
-.optA .status-bar { background:#FF6B6B; color:#fff; }
-.optA .app-header { background:#FFFAF7; }
-.optA .app-header h3 { color:#C62828; }
-.optA .map-placeholder { background:linear-gradient(180deg,#E8F5E9 0%,#C8E6C9 50%,#A5D6A7 100%); }
-.optA .style-chip { background:rgba(255,255,255,.9); color:#C62828; border-color:rgba(198,40,40,.2); }
-.optA .style-chip.active { background:#FF6B6B; color:#fff; border-color:#FF6B6B; }
-.optA .map-popup { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.15); color:#2D1B12; }
-.optA .popup-img { background:linear-gradient(135deg,#FFCDD2,#EF9A9A); }
-.optA .popup-chip { background:#FFEBEE; color:#C62828; }
-.optA .event-card { background:#FFF3EE; }
-.optA .event-thumb { background:linear-gradient(135deg,#FFCCBC,#FFAB91); }
-.optA .event-cat { background:#FFEBEE; color:#C62828; }
-.optA .bottom-nav { background:#FFFAF7; border-color:#FFE0D0; }
-.optA .nav-item.active { color:#FF6B6B; }
-.optA .nav-icon { background:#FFE0D0; }
-.optA .nav-item.active .nav-icon { background:#FF6B6B; }
+/* =========================================== */
+/* THEME A — Electric Violet (Neon Modern)     */
+/* =========================================== */
+.thA .opt-head{background:linear-gradient(135deg,#7C3AED,#A855F7,#C084FC);}
+.thA .tag{background:rgba(255,255,255,.2);color:#F3E8FF;}
+.thA .phone{background:#0F0B1E;color:#F0ECFF;}
+.thA .notch{background:#0F0B1E;color:#7C7A95;}
+.thA .app-bar{background:linear-gradient(180deg,#0F0B1E,#13102A);}
+.thA .app-bar h3{color:#C4B5FD;}
+.thA .app-bar-icon{background:#1E1640;color:#A78BFA;}
+.thA .map-bg{background:linear-gradient(165deg,#0D0A1A 0%,#1A1035 30%,#0F1A25 60%,#0A1520 100%);}
+.thA .chip{background:rgba(15,11,30,.7);color:#C4B5FD;border-color:rgba(167,139,250,.2);}
+.thA .chip.active{background:rgba(124,58,237,.8);color:#fff;border-color:#7C3AED;}
+.thA .pin-dot{background:#7C3AED;}.thA .pin-dot::after{border-top-color:#7C3AED;}
+.thA .pin-pulse{background:#7C3AED;}
+.thA .popup{background:rgba(15,11,30,.85);border-color:rgba(167,139,250,.2);color:#F0ECFF;}
+.thA .popup-thumb{background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;}
+.thA .popup-tag{background:rgba(124,58,237,.25);color:#C4B5FD;}
+.thA .popup-x{background:rgba(167,139,250,.15);color:#A78BFA;}
+.thA .popup-cta{color:#A855F7;}
+.thA .list-section{background:#0F0B1E;}
+.thA .list-label{color:#7C7A95;}
+.thA .ecard{background:#1A1435;border:1px solid #251E45;}
+.thA .ecard-img{background:linear-gradient(135deg,#4C1D95,#7C3AED);}
+.thA .ecard-chip{background:rgba(124,58,237,.2);color:#C4B5FD;}
+.thA .ecard-price{color:#A855F7;}
+.thA .bnav{background:#0B0818;border-color:#1A1435;}
+.thA .bnav-item.active{color:#A855F7;}
+.thA .bnav-item.active .bnav-ico::before{background:#7C3AED;}
+.thA .bnav-ico{color:inherit;}
 
-/* ================================ */
-/* OPTION B — Ocean Teal */
-/* ================================ */
-.optB .option-header { background:linear-gradient(135deg,#00897B,#26A69A); }
-.optB .badge { background:rgba(255,255,255,.25); color:#fff; }
-.optB .phone { background:#F0FDFA; color:#0F2B26; }
-.optB .status-bar { background:#00796B; color:#fff; }
-.optB .app-header { background:#F0FDFA; }
-.optB .app-header h3 { color:#00695C; }
-.optB .map-placeholder { background:linear-gradient(180deg,#E0F2F1 0%,#B2DFDB 50%,#80CBC4 100%); }
-.optB .style-chip { background:rgba(255,255,255,.9); color:#00695C; border-color:rgba(0,105,92,.2); }
-.optB .style-chip.active { background:#00897B; color:#fff; border-color:#00897B; }
-.optB .map-popup { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.15); color:#0F2B26; }
-.optB .popup-img { background:linear-gradient(135deg,#B2DFDB,#80CBC4); }
-.optB .popup-chip { background:#E0F2F1; color:#00695C; }
-.optB .event-card { background:#E0F7F4; }
-.optB .event-thumb { background:linear-gradient(135deg,#B2DFDB,#4DB6AC); }
-.optB .event-cat { background:#E0F2F1; color:#00695C; }
-.optB .bottom-nav { background:#F0FDFA; border-color:#B2DFDB; }
-.optB .nav-item.active { color:#00897B; }
-.optB .nav-icon { background:#B2DFDB; }
-.optB .nav-item.active .nav-icon { background:#00897B; }
+/* =========================================== */
+/* THEME B — Emerald Pulse (Nature Fresh)      */
+/* =========================================== */
+.thB .opt-head{background:linear-gradient(135deg,#059669,#10B981,#34D399);}
+.thB .tag{background:rgba(255,255,255,.2);color:#ECFDF5;}
+.thB .phone{background:#FAFDFB;color:#1A2E22;}
+.thB .notch{background:#FAFDFB;color:#6B8A7A;}
+.thB .app-bar{background:#FAFDFB;}
+.thB .app-bar h3{color:#065F46;}
+.thB .app-bar-icon{background:#D1FAE5;color:#059669;}
+.thB .map-bg{background:linear-gradient(165deg,#ECFDF5 0%,#D1FAE5 30%,#A7F3D0 60%,#6EE7B7 100%);}
+.thB .chip{background:rgba(255,255,255,.85);color:#065F46;border-color:rgba(5,150,105,.15);}
+.thB .chip.active{background:#059669;color:#fff;border-color:#059669;}
+.thB .pin-dot{background:#059669;}.thB .pin-dot::after{border-top-color:#059669;}
+.thB .pin-pulse{background:#059669;}
+.thB .popup{background:rgba(255,255,255,.92);border-color:rgba(5,150,105,.12);color:#1A2E22;box-shadow:0 8px 32px rgba(0,0,0,.1);}
+.thB .popup-thumb{background:linear-gradient(135deg,#059669,#34D399);color:#fff;}
+.thB .popup-tag{background:#D1FAE5;color:#065F46;}
+.thB .popup-x{background:#F0FDF4;color:#6B8A7A;}
+.thB .popup-cta{color:#059669;}
+.thB .list-section{background:#FAFDFB;}
+.thB .list-label{color:#6B8A7A;}
+.thB .ecard{background:#F0FDF4;border:1px solid #D1FAE5;}
+.thB .ecard-img{background:linear-gradient(135deg,#A7F3D0,#6EE7B7);}
+.thB .ecard-chip{background:#D1FAE5;color:#065F46;}
+.thB .ecard-price{color:#059669;}
+.thB .bnav{background:#FAFDFB;border-color:#D1FAE5;}
+.thB .bnav-item.active{color:#059669;}
+.thB .bnav-item.active .bnav-ico::before{background:#059669;}
 
-/* ================================ */
-/* OPTION C — Midnight Indigo */
-/* ================================ */
-.optC .option-header { background:linear-gradient(135deg,#1A237E,#3949AB); }
-.optC .badge { background:rgba(255,255,255,.2); color:#C5CAE9; }
-.optC .phone { background:#0D1117; color:#E8EAED; }
-.optC .status-bar { background:#0D1117; color:#8899AA; }
-.optC .app-header { background:#0D1117; }
-.optC .app-header h3 { color:#7C8DFF; }
-.optC .map-placeholder { background:linear-gradient(180deg,#1A1E2E 0%,#252B3F 50%,#303850 100%); }
-.optC .style-chip { background:rgba(30,36,56,.9); color:#9FA8DA; border-color:rgba(159,168,218,.3); }
-.optC .style-chip.active { background:#3949AB; color:#fff; border-color:#3949AB; }
-.optC .map-popup { background:#1C2333; box-shadow:0 4px 24px rgba(0,0,0,.5); color:#E8EAED; border:1px solid #2D3548; }
-.optC .popup-img { background:linear-gradient(135deg,#283593,#3F51B5); }
-.optC .popup-chip { background:#1A237E; color:#9FA8DA; }
-.optC .event-card { background:#161B27; border:1px solid #2D3548; }
-.optC .event-thumb { background:linear-gradient(135deg,#1A237E,#3949AB); }
-.optC .event-cat { background:#1A237E; color:#9FA8DA; }
-.optC .bottom-nav { background:#0D1117; border-color:#1E2536; }
-.optC .nav-item { color:#6B7A8D; }
-.optC .nav-item.active { color:#7C8DFF; }
-.optC .nav-icon { background:#1E2536; }
-.optC .nav-item.active .nav-icon { background:#3949AB; }
+/* =========================================== */
+/* THEME C — Rose Flame (Warm Gradient)        */
+/* =========================================== */
+.thC .opt-head{background:linear-gradient(135deg,#E11D48,#F43F5E,#FB7185);}
+.thC .tag{background:rgba(255,255,255,.2);color:#FFF1F2;}
+.thC .phone{background:#1A0A10;color:#FDE8EC;}
+.thC .notch{background:#1A0A10;color:#8A6070;}
+.thC .app-bar{background:linear-gradient(180deg,#1A0A10,#200E15);}
+.thC .app-bar h3{color:#FDA4AF;}
+.thC .app-bar-icon{background:#35101E;color:#FB7185;}
+.thC .map-bg{background:linear-gradient(165deg,#1A0A10 0%,#2D101C 30%,#1A1525 60%,#151020 100%);}
+.thC .chip{background:rgba(26,10,16,.7);color:#FDA4AF;border-color:rgba(251,113,133,.2);}
+.thC .chip.active{background:rgba(225,29,72,.8);color:#fff;border-color:#E11D48;}
+.thC .pin-dot{background:#E11D48;}.thC .pin-dot::after{border-top-color:#E11D48;}
+.thC .pin-pulse{background:#E11D48;}
+.thC .popup{background:rgba(26,10,16,.88);border-color:rgba(251,113,133,.15);color:#FDE8EC;}
+.thC .popup-thumb{background:linear-gradient(135deg,#E11D48,#FB7185);color:#fff;}
+.thC .popup-tag{background:rgba(225,29,72,.2);color:#FDA4AF;}
+.thC .popup-x{background:rgba(251,113,133,.12);color:#FB7185;}
+.thC .popup-cta{color:#FB7185;}
+.thC .list-section{background:#1A0A10;}
+.thC .list-label{color:#8A6070;}
+.thC .ecard{background:#25101A;border:1px solid #3A1528;}
+.thC .ecard-img{background:linear-gradient(135deg,#9F1239,#E11D48);}
+.thC .ecard-chip{background:rgba(225,29,72,.15);color:#FDA4AF;}
+.thC .ecard-price{color:#FB7185;}
+.thC .bnav{background:#120810;border-color:#25101A;}
+.thC .bnav-item.active{color:#FB7185;}
+.thC .bnav-item.active .bnav-ico::before{background:#E11D48;}
 
-/* ================================ */
-/* OPTION D — Saffron Gold */
-/* ================================ */
-.optD .option-header { background:linear-gradient(135deg,#F57F17,#FFB300); }
-.optD .badge { background:rgba(0,0,0,.15); color:#4E2A00; }
-.optD .phone { background:#FFFDE7; color:#3E2723; }
-.optD .status-bar { background:#F57F17; color:#fff; }
-.optD .app-header { background:#FFFDE7; }
-.optD .app-header h3 { color:#E65100; }
-.optD .map-placeholder { background:linear-gradient(180deg,#FFF9C4 0%,#FFF176 30%,#E8F5E9 60%,#C8E6C9 100%); }
-.optD .style-chip { background:rgba(255,255,255,.9); color:#E65100; border-color:rgba(230,81,0,.2); }
-.optD .style-chip.active { background:#F57F17; color:#fff; border-color:#F57F17; }
-.optD .map-popup { background:#fff; box-shadow:0 4px 20px rgba(0,0,0,.12); color:#3E2723; }
-.optD .popup-img { background:linear-gradient(135deg,#FFE082,#FFB300); }
-.optD .popup-chip { background:#FFF8E1; color:#E65100; }
-.optD .event-card { background:#FFF8E1; }
-.optD .event-thumb { background:linear-gradient(135deg,#FFECB3,#FFB300); }
-.optD .event-cat { background:#FFF8E1; color:#E65100; }
-.optD .bottom-nav { background:#FFFDE7; border-color:#FFE082; }
-.optD .nav-item.active { color:#F57F17; }
-.optD .nav-icon { background:#FFE082; }
-.optD .nav-item.active .nav-icon { background:#F57F17; }
+/* =========================================== */
+/* THEME D — Solar Amber (Bold & Bright)       */
+/* =========================================== */
+.thD .opt-head{background:linear-gradient(135deg,#D97706,#F59E0B,#FBBF24);}
+.thD .tag{background:rgba(0,0,0,.15);color:#451A03;}
+.thD .phone{background:#FFFCF5;color:#292018;}
+.thD .notch{background:#FFFCF5;color:#92785A;}
+.thD .app-bar{background:#FFFCF5;}
+.thD .app-bar h3{color:#92400E;}
+.thD .app-bar-icon{background:#FEF3C7;color:#D97706;}
+.thD .map-bg{background:linear-gradient(165deg,#FFFBEB 0%,#FEF3C7 25%,#FDE68A 50%,#E8F5E0 80%,#D1FAE5 100%);}
+.thD .chip{background:rgba(255,255,255,.85);color:#92400E;border-color:rgba(217,119,6,.15);}
+.thD .chip.active{background:#D97706;color:#fff;border-color:#D97706;}
+.thD .pin-dot{background:#D97706;}.thD .pin-dot::after{border-top-color:#D97706;}
+.thD .pin-pulse{background:#D97706;}
+.thD .popup{background:rgba(255,255,255,.94);border-color:rgba(217,119,6,.1);color:#292018;box-shadow:0 8px 32px rgba(0,0,0,.08);}
+.thD .popup-thumb{background:linear-gradient(135deg,#D97706,#FBBF24);color:#fff;}
+.thD .popup-tag{background:#FEF3C7;color:#92400E;}
+.thD .popup-x{background:#FEF3C7;color:#92785A;}
+.thD .popup-cta{color:#D97706;}
+.thD .list-section{background:#FFFCF5;}
+.thD .list-label{color:#92785A;}
+.thD .ecard{background:#FFF8EB;border:1px solid #FEF3C7;}
+.thD .ecard-img{background:linear-gradient(135deg,#FCD34D,#F59E0B);}
+.thD .ecard-chip{background:#FEF3C7;color:#92400E;}
+.thD .ecard-price{color:#D97706;}
+.thD .bnav{background:#FFFCF5;border-color:#FDE68A;}
+.thD .bnav-item.active{color:#D97706;}
+.thD .bnav-item.active .bnav-ico::before{background:#D97706;}
 
-/* Marker dots on map */
-.marker { position:absolute; width:14px; height:14px; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.3); }
-.optA .marker { background:#FF6B6B; }
-.optB .marker { background:#00897B; }
-.optC .marker { background:#5C6BC0; }
-.optD .marker { background:#F57F17; }
+/* Dark mode variants */
+.dark .thB .phone{background:#071210;color:#D1FAE5;}
+.dark .thB .notch{background:#071210;color:#4D7A65;}
+.dark .thB .app-bar{background:#071210;}
+.dark .thB .app-bar h3{color:#6EE7B7;}
+.dark .thB .app-bar-icon{background:#0D2818;color:#34D399;}
+.dark .thB .map-bg{background:linear-gradient(165deg,#051510 0%,#0A2218 30%,#0D2E22 60%,#103828 100%);}
+.dark .thB .chip{background:rgba(7,18,16,.7);color:#6EE7B7;border-color:rgba(52,211,153,.2);}
+.dark .thB .popup{background:rgba(7,18,16,.88);border-color:rgba(52,211,153,.15);color:#D1FAE5;}
+.dark .thB .popup-thumb{background:linear-gradient(135deg,#059669,#34D399);}
+.dark .thB .popup-tag{background:rgba(5,150,105,.2);color:#6EE7B7;}
+.dark .thB .popup-x{background:rgba(52,211,153,.1);color:#34D399;}
+.dark .thB .list-section{background:#071210;}
+.dark .thB .list-label{color:#4D7A65;}
+.dark .thB .ecard{background:#0D1E18;border-color:#153025;}
+.dark .thB .ecard-img{background:linear-gradient(135deg,#065F46,#059669);}
+.dark .thB .ecard-chip{background:rgba(5,150,105,.15);color:#6EE7B7;}
+.dark .thB .bnav{background:#050F0C;border-color:#0D1E18;}
+
+.dark .thD .phone{background:#1A1408;color:#FEF3C7;}
+.dark .thD .notch{background:#1A1408;color:#8A7A55;}
+.dark .thD .app-bar{background:#1A1408;}
+.dark .thD .app-bar h3{color:#FCD34D;}
+.dark .thD .app-bar-icon{background:#2D2210;color:#FBBF24;}
+.dark .thD .map-bg{background:linear-gradient(165deg,#1A1408 0%,#2D2210 30%,#352A15 60%,#1A2510 100%);}
+.dark .thD .chip{background:rgba(26,20,8,.7);color:#FCD34D;border-color:rgba(251,191,36,.2);}
+.dark .thD .popup{background:rgba(26,20,8,.88);border-color:rgba(251,191,36,.15);color:#FEF3C7;}
+.dark .thD .popup-thumb{background:linear-gradient(135deg,#D97706,#FBBF24);}
+.dark .thD .popup-tag{background:rgba(217,119,6,.2);color:#FCD34D;}
+.dark .thD .popup-x{background:rgba(251,191,36,.1);color:#FBBF24;}
+.dark .thD .list-section{background:#1A1408;}
+.dark .thD .list-label{color:#8A7A55;}
+.dark .thD .ecard{background:#251E10;border-color:#352A15;}
+.dark .thD .ecard-img{background:linear-gradient(135deg,#92400E,#D97706);}
+.dark .thD .ecard-chip{background:rgba(217,119,6,.15);color:#FCD34D;}
+.dark .thD .bnav{background:#120E06;border-color:#251E10;}
+
+/* Selected glow */
+#selection{text-align:center;margin-top:36px;min-height:48px;}
+#selection span{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;background:linear-gradient(135deg,#A78BFA,#F472B6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 </style>
 </head>
 <body>
 
-<h1>EventBuzz Theme Options</h1>
-<p class="subtitle">Pick a theme for the app. Each preview shows the Map screen with an event popup.</p>
+<div class="page-header">
+  <h1>EventBuzz Themes V2</h1>
+  <p>Modern, event-focused theme options. Toggle light/dark to preview both modes. Click to select.</p>
+</div>
+
+<div class="mode-toggle">
+  <button class="mode-btn" onclick="setMode('light')">Light</button>
+  <button class="mode-btn active" onclick="setMode('dark')">Dark</button>
+</div>
 
 <div class="grid">
 
-<!-- ============ OPTION A — Sunset Coral ============ -->
-<div class="option optA" onclick="select(this)">
-  <div class="option-header">
-    <h2>A — Sunset Coral</h2>
-    <span class="badge">WARM &amp; VIBRANT</span>
+<!-- ======= A — ELECTRIC VIOLET ======= -->
+<div class="option thA" onclick="select(this)">
+  <div class="opt-head">
+    <h2>A — Electric Violet</h2>
+    <span class="tag">Neon Modern</span>
   </div>
   <div class="phone">
-    <div class="status-bar"><span>9:41</span><span>100%</span></div>
-    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="notch"><span>9:41</span><span>4G</span></div>
+    <div class="app-bar">
+      <h3>EventBuzz</h3>
+      <div class="app-bar-icons"><div class="app-bar-icon">&#x1F50D;</div><div class="app-bar-icon">&#x1F514;</div></div>
+    </div>
     <div class="map-area">
-      <div class="map-placeholder"></div>
-      <div class="style-chips">
-        <div class="style-chip active">Liberty</div>
-        <div class="style-chip">Bright</div>
-        <div class="style-chip">Dark</div>
+      <div class="map-bg"></div>
+      <div class="chips">
+        <div class="chip active">Liberty</div>
+        <div class="chip">Bright</div>
+        <div class="chip">Dark</div>
       </div>
-      <div class="marker" style="top:30%;left:40%"></div>
-      <div class="marker" style="top:55%;left:65%"></div>
-      <div class="marker" style="top:45%;left:50%"></div>
-      <div class="map-popup">
-        <div class="popup-img"></div>
-        <div>
-          <div class="popup-title">Bangalore Jazz Festival</div>
-          <div class="popup-meta">Jayamahal Palace, Palace Rd</div>
-          <span class="popup-chip">Music</span> <span class="popup-meta" style="margin-left:4px">2 km</span>
+      <div class="pin" style="top:28%;left:32%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="pin" style="top:55%;left:68%"><div class="pin-dot">E</div></div>
+      <div class="pin" style="top:40%;left:50%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="popup">
+        <div class="popup-x">&times;</div>
+        <div class="popup-row">
+          <div class="popup-thumb">&#127925;</div>
+          <div class="popup-body">
+            <div class="popup-title">Bangalore Jazz Festival</div>
+            <div class="popup-addr">Jayamahal Palace, Palace Rd</div>
+            <div class="popup-tags">
+              <span class="popup-tag">Music</span>
+              <span class="popup-dist">2 km away</span>
+            </div>
+          </div>
         </div>
-        <span class="popup-close">&times;</span>
+        <div class="popup-cta">Tap for details &rarr;</div>
       </div>
     </div>
-    <div class="event-list">
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">Cubbon Park Morning Run</div>
-          <div class="event-date">Tomorrow &middot; 6:00 AM</div>
-          <span class="event-cat">Sports</span>
+    <div class="list-section">
+      <div class="list-label">Nearby Events</div>
+      <div class="cards">
+        <div class="ecard">
+          <div class="ecard-img">&#127939;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">Cubbon Park Morning Run</div>
+            <div class="ecard-sub">Tomorrow &middot; 6:00 AM</div>
+            <div class="ecard-row"><span class="ecard-chip">Sports</span><span class="ecard-price">Free</span></div>
+          </div>
         </div>
-      </div>
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">VV Puram Food Street Walk</div>
-          <div class="event-date">Sat, Feb 15 &middot; 5:30 PM</div>
-          <span class="event-cat">Food</span>
+        <div class="ecard">
+          <div class="ecard-img">&#127836;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">VV Puram Food Street Walk</div>
+            <div class="ecard-sub">Sat, Feb 15 &middot; 5:30 PM</div>
+            <div class="ecard-row"><span class="ecard-chip">Food</span><span class="ecard-price">&#8377;250</span></div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="bottom-nav">
-      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
-      <div class="nav-item"><div class="nav-icon"></div>List</div>
-      <div class="nav-item"><div class="nav-icon"></div>Search</div>
-      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    <div class="bnav">
+      <div class="bnav-item active"><div class="bnav-ico">&#127758;</div>Map</div>
+      <div class="bnav-item"><div class="bnav-ico">&#9776;</div>List</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128269;</div>Search</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128100;</div>Profile</div>
     </div>
   </div>
 </div>
 
-<!-- ============ OPTION B — Ocean Teal ============ -->
-<div class="option optB" onclick="select(this)">
-  <div class="option-header">
-    <h2>B — Ocean Teal</h2>
-    <span class="badge">CALM &amp; FRESH</span>
+<!-- ======= B — EMERALD PULSE ======= -->
+<div class="option thB" onclick="select(this)">
+  <div class="opt-head">
+    <h2>B — Emerald Pulse</h2>
+    <span class="tag">Nature Fresh</span>
   </div>
   <div class="phone">
-    <div class="status-bar"><span>9:41</span><span>100%</span></div>
-    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="notch"><span>9:41</span><span>5G</span></div>
+    <div class="app-bar">
+      <h3>EventBuzz</h3>
+      <div class="app-bar-icons"><div class="app-bar-icon">&#x1F50D;</div><div class="app-bar-icon">&#x1F514;</div></div>
+    </div>
     <div class="map-area">
-      <div class="map-placeholder"></div>
-      <div class="style-chips">
-        <div class="style-chip active">Liberty</div>
-        <div class="style-chip">Bright</div>
-        <div class="style-chip">Dark</div>
+      <div class="map-bg"></div>
+      <div class="chips">
+        <div class="chip active">Liberty</div>
+        <div class="chip">Bright</div>
+        <div class="chip">Positron</div>
       </div>
-      <div class="marker" style="top:35%;left:45%"></div>
-      <div class="marker" style="top:60%;left:55%"></div>
-      <div class="marker" style="top:42%;left:52%"></div>
-      <div class="map-popup">
-        <div class="popup-img"></div>
-        <div>
-          <div class="popup-title">Indie Music Night at Fandom</div>
-          <div class="popup-meta">Fandom at Gilly's, Koramangala</div>
-          <span class="popup-chip">Music</span> <span class="popup-meta" style="margin-left:4px">4 km</span>
+      <div class="pin" style="top:30%;left:38%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="pin" style="top:58%;left:60%"><div class="pin-dot">E</div></div>
+      <div class="pin" style="top:42%;left:52%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="popup">
+        <div class="popup-x">&times;</div>
+        <div class="popup-row">
+          <div class="popup-thumb">&#127866;</div>
+          <div class="popup-body">
+            <div class="popup-title">Craft Beer Crawl</div>
+            <div class="popup-addr">Toit Brewpub, Indiranagar</div>
+            <div class="popup-tags">
+              <span class="popup-tag">Food</span>
+              <span class="popup-dist">3 km away</span>
+            </div>
+          </div>
         </div>
-        <span class="popup-close">&times;</span>
+        <div class="popup-cta">Tap for details &rarr;</div>
       </div>
     </div>
-    <div class="event-list">
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">Craft Beer Crawl</div>
-          <div class="event-date">Fri, Feb 14 &middot; 7:00 PM</div>
-          <span class="event-cat">Food</span>
+    <div class="list-section">
+      <div class="list-label">Nearby Events</div>
+      <div class="cards">
+        <div class="ecard">
+          <div class="ecard-img">&#128187;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">Android Dev Meetup</div>
+            <div class="ecard-sub">Wed, Feb 19 &middot; 6:30 PM</div>
+            <div class="ecard-row"><span class="ecard-chip">Tech</span><span class="ecard-price">Free</span></div>
+          </div>
         </div>
-      </div>
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">Android Dev Meetup</div>
-          <div class="event-date">Wed, Feb 19 &middot; 6:30 PM</div>
-          <span class="event-cat">Tech</span>
+        <div class="ecard">
+          <div class="ecard-img">&#127752;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">Nandi Hills Sunrise Trek</div>
+            <div class="ecard-sub">Sun, Feb 16 &middot; 4:30 AM</div>
+            <div class="ecard-row"><span class="ecard-chip">Outdoor</span><span class="ecard-price">&#8377;500</span></div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="bottom-nav">
-      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
-      <div class="nav-item"><div class="nav-icon"></div>List</div>
-      <div class="nav-item"><div class="nav-icon"></div>Search</div>
-      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    <div class="bnav">
+      <div class="bnav-item active"><div class="bnav-ico">&#127758;</div>Map</div>
+      <div class="bnav-item"><div class="bnav-ico">&#9776;</div>List</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128269;</div>Search</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128100;</div>Profile</div>
     </div>
   </div>
 </div>
 
-<!-- ============ OPTION C — Midnight Indigo ============ -->
-<div class="option optC" onclick="select(this)">
-  <div class="option-header">
-    <h2>C — Midnight Indigo</h2>
-    <span class="badge">DARK &amp; SLEEK</span>
+<!-- ======= C — ROSE FLAME ======= -->
+<div class="option thC" onclick="select(this)">
+  <div class="opt-head">
+    <h2>C — Rose Flame</h2>
+    <span class="tag">Warm Gradient</span>
   </div>
   <div class="phone">
-    <div class="status-bar"><span>9:41</span><span>100%</span></div>
-    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="notch"><span>9:41</span><span>4G</span></div>
+    <div class="app-bar">
+      <h3>EventBuzz</h3>
+      <div class="app-bar-icons"><div class="app-bar-icon">&#x1F50D;</div><div class="app-bar-icon">&#x1F514;</div></div>
+    </div>
     <div class="map-area">
-      <div class="map-placeholder"></div>
-      <div class="style-chips">
-        <div class="style-chip">Liberty</div>
-        <div class="style-chip">Bright</div>
-        <div class="style-chip active">Dark</div>
+      <div class="map-bg"></div>
+      <div class="chips">
+        <div class="chip">Liberty</div>
+        <div class="chip">Bright</div>
+        <div class="chip active">Dark</div>
       </div>
-      <div class="marker" style="top:33%;left:38%"></div>
-      <div class="marker" style="top:58%;left:62%"></div>
-      <div class="marker" style="top:48%;left:48%"></div>
-      <div class="map-popup">
-        <div class="popup-img"></div>
-        <div>
-          <div class="popup-title">AI/ML Conference Bangalore</div>
-          <div class="popup-meta">NIMHANS Convention Centre</div>
-          <span class="popup-chip">Tech</span> <span class="popup-meta" style="margin-left:4px">6 km</span>
+      <div class="pin" style="top:32%;left:42%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="pin" style="top:60%;left:55%"><div class="pin-dot">E</div></div>
+      <div class="pin" style="top:45%;left:48%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="popup">
+        <div class="popup-x">&times;</div>
+        <div class="popup-row">
+          <div class="popup-thumb">&#127912;</div>
+          <div class="popup-body">
+            <div class="popup-title">Rangoli Art Exhibition</div>
+            <div class="popup-addr">Karnataka Chitrakala Parishath</div>
+            <div class="popup-tags">
+              <span class="popup-tag">Arts</span>
+              <span class="popup-dist">3 km away</span>
+            </div>
+          </div>
         </div>
-        <span class="popup-close">&times;</span>
+        <div class="popup-cta">Tap for details &rarr;</div>
       </div>
     </div>
-    <div class="event-list">
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">Nandi Hills Sunrise Trek</div>
-          <div class="event-date">Sun, Feb 16 &middot; 4:30 AM</div>
-          <span class="event-cat">Outdoor</span>
+    <div class="list-section">
+      <div class="list-label">Nearby Events</div>
+      <div class="cards">
+        <div class="ecard">
+          <div class="ecard-img">&#127911;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">Carnatic Music Concert</div>
+            <div class="ecard-sub">Fri, Feb 14 &middot; 6:00 PM</div>
+            <div class="ecard-row"><span class="ecard-chip">Music</span><span class="ecard-price">&#8377;800</span></div>
+          </div>
         </div>
-      </div>
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">Bangalore Comic Con</div>
-          <div class="event-date">Mar 1-2 &middot; 10:00 AM</div>
-          <span class="event-cat">Community</span>
+        <div class="ecard">
+          <div class="ecard-img">&#127917;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">Bangalore Comic Con</div>
+            <div class="ecard-sub">Mar 1-2 &middot; 10:00 AM</div>
+            <div class="ecard-row"><span class="ecard-chip">Community</span><span class="ecard-price">&#8377;999</span></div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="bottom-nav">
-      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
-      <div class="nav-item"><div class="nav-icon"></div>List</div>
-      <div class="nav-item"><div class="nav-icon"></div>Search</div>
-      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    <div class="bnav">
+      <div class="bnav-item active"><div class="bnav-ico">&#127758;</div>Map</div>
+      <div class="bnav-item"><div class="bnav-ico">&#9776;</div>List</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128269;</div>Search</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128100;</div>Profile</div>
     </div>
   </div>
 </div>
 
-<!-- ============ OPTION D — Saffron Gold ============ -->
-<div class="option optD" onclick="select(this)">
-  <div class="option-header">
-    <h2>D — Saffron Gold</h2>
-    <span class="badge">BOLD &amp; FESTIVE</span>
+<!-- ======= D — SOLAR AMBER ======= -->
+<div class="option thD" onclick="select(this)">
+  <div class="opt-head">
+    <h2>D — Solar Amber</h2>
+    <span class="tag">Bold &amp; Bright</span>
   </div>
   <div class="phone">
-    <div class="status-bar"><span>9:41</span><span>100%</span></div>
-    <div class="app-header"><h3>EventBuzz</h3><div class="search-icon"></div></div>
+    <div class="notch"><span>9:41</span><span>5G</span></div>
+    <div class="app-bar">
+      <h3>EventBuzz</h3>
+      <div class="app-bar-icons"><div class="app-bar-icon">&#x1F50D;</div><div class="app-bar-icon">&#x1F514;</div></div>
+    </div>
     <div class="map-area">
-      <div class="map-placeholder"></div>
-      <div class="style-chips">
-        <div class="style-chip active">Liberty</div>
-        <div class="style-chip">Bright</div>
-        <div class="style-chip">Positron</div>
+      <div class="map-bg"></div>
+      <div class="chips">
+        <div class="chip active">Liberty</div>
+        <div class="chip">Bright</div>
+        <div class="chip">Positron</div>
       </div>
-      <div class="marker" style="top:32%;left:42%"></div>
-      <div class="marker" style="top:56%;left:58%"></div>
-      <div class="marker" style="top:44%;left:46%"></div>
-      <div class="map-popup">
-        <div class="popup-img"></div>
-        <div>
-          <div class="popup-title">Rangoli Art Exhibition</div>
-          <div class="popup-meta">Karnataka Chitrakala Parishath</div>
-          <span class="popup-chip">Arts</span> <span class="popup-meta" style="margin-left:4px">3 km</span>
+      <div class="pin" style="top:35%;left:36%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="pin" style="top:52%;left:64%"><div class="pin-dot">E</div></div>
+      <div class="pin" style="top:46%;left:46%"><div class="pin-dot">E<div class="pin-pulse"></div></div></div>
+      <div class="popup">
+        <div class="popup-x">&times;</div>
+        <div class="popup-row">
+          <div class="popup-thumb">&#128640;</div>
+          <div class="popup-body">
+            <div class="popup-title">Startup Pitch Night</div>
+            <div class="popup-addr">91springboard, Koramangala</div>
+            <div class="popup-tags">
+              <span class="popup-tag">Tech</span>
+              <span class="popup-dist">5 km away</span>
+            </div>
+          </div>
         </div>
-        <span class="popup-close">&times;</span>
+        <div class="popup-cta">Tap for details &rarr;</div>
       </div>
     </div>
-    <div class="event-list">
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">Startup Pitch Night</div>
-          <div class="event-date">Thu, Feb 14 &middot; 7:00 PM</div>
-          <span class="event-cat">Tech</span>
+    <div class="list-section">
+      <div class="list-label">Nearby Events</div>
+      <div class="cards">
+        <div class="ecard">
+          <div class="ecard-img">&#127834;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">South Indian Cooking Class</div>
+            <div class="ecard-sub">Sat, Feb 22 &middot; 11:00 AM</div>
+            <div class="ecard-row"><span class="ecard-chip">Food</span><span class="ecard-price">&#8377;1,200</span></div>
+          </div>
         </div>
-      </div>
-      <div class="event-card">
-        <div class="event-thumb"></div>
-        <div class="event-info">
-          <div class="event-title">South Indian Cooking Class</div>
-          <div class="event-date">Sat, Feb 22 &middot; 11:00 AM</div>
-          <span class="event-cat">Food</span>
+        <div class="ecard">
+          <div class="ecard-img">&#128694;</div>
+          <div class="ecard-body">
+            <div class="ecard-title">Lalbagh Botanical Walk</div>
+            <div class="ecard-sub">Sun, Feb 16 &middot; 7:00 AM</div>
+            <div class="ecard-row"><span class="ecard-chip">Outdoor</span><span class="ecard-price">Free</span></div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="bottom-nav">
-      <div class="nav-item active"><div class="nav-icon"></div>Map</div>
-      <div class="nav-item"><div class="nav-icon"></div>List</div>
-      <div class="nav-item"><div class="nav-icon"></div>Search</div>
-      <div class="nav-item"><div class="nav-icon"></div>Profile</div>
+    <div class="bnav">
+      <div class="bnav-item active"><div class="bnav-ico">&#127758;</div>Map</div>
+      <div class="bnav-item"><div class="bnav-ico">&#9776;</div>List</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128269;</div>Search</div>
+      <div class="bnav-item"><div class="bnav-ico">&#128100;</div>Profile</div>
     </div>
   </div>
 </div>
 
 </div><!-- grid -->
 
-<div id="selection" style="text-align:center;margin-top:32px;font-size:16px;color:#888;min-height:40px;"></div>
+<div id="selection"></div>
 
 <script>
-function select(el) {
-  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+function select(el){
+  document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
   el.classList.add('selected');
-  const name = el.querySelector('h2').textContent;
-  document.getElementById('selection').innerHTML =
-    '<span style="color:#FFD700;font-weight:700;">Selected: ' + name + '</span>';
+  const name=el.querySelector('h2').textContent;
+  document.getElementById('selection').innerHTML='<span>Selected: '+name+'</span>';
 }
+function setMode(mode){
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(mode==='dark')document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+}
+document.body.classList.add('dark');
 </script>
 
 </body>
