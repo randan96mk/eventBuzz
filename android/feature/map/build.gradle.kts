@@ -31,6 +31,7 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons)
     implementation(libs.lifecycle.viewmodel)
@@ -39,4 +40,8 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
     implementation(libs.coroutines.android)
+
+    implementation(libs.maplibre)
+
+    debugImplementation(libs.compose.ui.tooling)
 }
