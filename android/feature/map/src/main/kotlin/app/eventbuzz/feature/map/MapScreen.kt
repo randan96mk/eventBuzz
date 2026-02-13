@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,11 +46,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
@@ -103,15 +107,26 @@ fun MapScreen(
             }
 
             is MapUiState.Success -> {
+                // Track marker screen position reported by MapLibreView
+                var markerScreenPos by remember { mutableStateOf(android.graphics.PointF(0f, 0f)) }
+                // Track the Box size so we can clamp the popup inside
+                var boxSize by remember { mutableStateOf(IntSize.Zero) }
+                val density = LocalDensity.current
+
                 // Map view (full screen, behind overlays)
                 MapLibreView(
                     events = state.events,
                     mapStyle = state.mapStyle,
                     centerLat = userLocation?.latitude ?: 12.9716,
                     centerLng = userLocation?.longitude ?: 77.5946,
-                    onMarkerClick = { event -> viewModel.selectEvent(event) },
+                    onMarkerClick = { event, screenPos ->
+                        markerScreenPos = screenPos
+                        viewModel.selectEvent(event)
+                    },
                     onMapTap = { viewModel.selectEvent(null) },
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned { boxSize = it.size },
                 )
 
                 // Map style selector overlay at top
@@ -145,16 +160,33 @@ fun MapScreen(
                     }
                 }
 
-                // Event popup card overlay — positioned above the marker
+                // Event popup card overlay — positioned above the tapped marker
+                var popupSize by remember { mutableStateOf(IntSize.Zero) }
+
                 AnimatedVisibility(
                     visible = selectedEvent != null,
                     enter = fadeIn() + scaleIn(initialScale = 0.8f),
                     exit = fadeOut() + scaleOut(targetScale = 0.8f),
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 48.dp)
-                        .zIndex(2f),
+                        .zIndex(2f)
+                        .onGloballyPositioned { popupSize = it.size }
+                        .offset {
+                            // Place the popup so the pointer tip is at the marker position.
+                            // Pointer is centered horizontally and at the very bottom of the popup.
+                            val markerXPx = markerScreenPos.x.toInt()
+                            val markerYPx = markerScreenPos.y.toInt()
+                            val halfW = popupSize.width / 2
+                            val popupH = popupSize.height
+
+                            // Center popup horizontally on the marker, clamp to screen edges
+                            val x = (markerXPx - halfW)
+                                .coerceIn(0, (boxSize.width - popupSize.width).coerceAtLeast(0))
+                            // Position popup above marker with 8dp gap
+                            val gapPx = with(density) { 8.dp.roundToPx() }
+                            val y = (markerYPx - popupH - gapPx).coerceAtLeast(0)
+
+                            IntOffset(x, y)
+                        },
                 ) {
                     selectedEvent?.let { event ->
                         EventPopupCard(
@@ -308,7 +340,7 @@ private fun MapLibreView(
     mapStyle: MapStyle,
     centerLat: Double,
     centerLng: Double,
-    onMarkerClick: (Event) -> Unit,
+    onMarkerClick: (Event, android.graphics.PointF) -> Unit,
     onMapTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -366,7 +398,9 @@ private fun MapLibreView(
             map.setOnMarkerClickListener { marker ->
                 val event = eventByTitle[marker.title]
                 if (event != null) {
-                    onMarkerClick(event)
+                    // Get the marker's screen position before animating
+                    val screenPos = map.projection.toScreenLocation(marker.position)
+                    onMarkerClick(event, screenPos)
                     map.animateCamera(
                         org.maplibre.android.camera.CameraUpdateFactory.newLatLngZoom(
                             LatLng(event.location.latitude, event.location.longitude),
