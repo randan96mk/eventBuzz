@@ -30,7 +30,7 @@ class ListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ListUiState())
     val uiState: StateFlow<ListUiState> = _uiState.asStateFlow()
 
-    private var currentLocation: Location = Location(40.7128, -74.0060) // Default NYC
+    private var currentLocation: Location = Location(12.9716, 77.5946) // Default Bangalore
 
     init {
         loadEvents()

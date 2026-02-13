@@ -97,6 +97,112 @@ class FakeEventRepository @Inject constructor() : EventRepository {
         add(event("48", "Neighborhood Town Hall", "Open forum to discuss local issues with community leaders and elected officials.", categories[6], 40.7607, -73.9250, "Astoria Community Center", "Queens", 6, null))
         add(event("49", "Pet Adoption Fair", "Find your new best friend. Dogs, cats, and small animals available for adoption.", categories[6], 40.7430, -73.9890, "Madison Square Park", "New York", 2, "https://picsum.photos/seed/pets/400/300"))
         add(event("50", "Cultural Dance Festival", "Performances and workshops featuring dances from around the world.", categories[6], 40.6712, -73.9636, "Prospect Park Bandshell", "Brooklyn", 8, "https://picsum.photos/seed/dance/400/300"))
+
+        // ========== BANGALORE (Bengaluru) ==========
+        // Music
+        add(event("51", "Bangalore Jazz Festival", "International jazz artists perform under the stars at Jayamahal Palace grounds.", categories[0], 12.9896, 77.5929, "Jayamahal Palace, Palace Rd", "Bangalore", 2, "https://picsum.photos/seed/blr-jazz/400/300"))
+        add(event("52", "Indie Music Night at Fandom", "Live indie rock and alternative bands at Bangalore's favorite music venue.", categories[0], 12.9352, 77.6245, "Fandom at Gilly's, Koramangala", "Bangalore", 1, null))
+        add(event("53", "Carnatic Music Concert", "Classical Carnatic music recital featuring renowned vocalists and instrumentalists.", categories[0], 12.9719, 77.5937, "Chowdiah Memorial Hall, Malleswaram", "Bangalore", 5, "https://picsum.photos/seed/blr-carnatic/400/300"))
+
+        // Sports
+        add(event("54", "Cubbon Park Morning Run", "Weekly 5K group run through the green trails of Cubbon Park. All fitness levels.", categories[1], 12.9763, 77.5929, "Cubbon Park Main Gate", "Bangalore", 0, "https://picsum.photos/seed/blr-run/400/300"))
+        add(event("55", "Badminton Tournament", "Open singles and doubles tournament at the Padukone-Dravid Centre.", categories[1], 12.9256, 77.6028, "Padukone-Dravid Centre, JP Nagar", "Bangalore", 4, null))
+        add(event("56", "Cricket Gully League Finals", "Neighborhood cricket league championship match. Come cheer your local team!", categories[1], 12.9698, 77.7500, "Whitefield Sports Ground", "Bangalore", 6, "https://picsum.photos/seed/blr-cricket/400/300"))
+
+        // Food & Drink
+        add(event("57", "VV Puram Food Street Walk", "Guided food walk through Bangalore's legendary VV Puram food street. 10+ stops.", categories[2], 12.9480, 77.5730, "VV Puram Food Street", "Bangalore", 1, "https://picsum.photos/seed/blr-food/400/300"))
+        add(event("58", "Craft Beer Crawl", "Hop between Bangalore's best microbreweries in Koramangala and Indiranagar.", categories[2], 12.9716, 77.6412, "Toit Brewpub, Indiranagar", "Bangalore", 3, null))
+        add(event("59", "South Indian Cooking Class", "Learn to make dosa, idli, sambar and chutney from scratch. All ingredients provided.", categories[2], 12.9352, 77.6245, "Culinary Academy, Koramangala", "Bangalore", 7, "https://picsum.photos/seed/blr-dosa/400/300"))
+
+        // Tech
+        add(event("60", "Bangalore Startup Pitch Night", "10 early-stage startups pitch to VCs and angel investors. Networking and drinks.", categories[4], 12.9352, 77.6245, "91springboard, Koramangala", "Bangalore", 2, "https://picsum.photos/seed/blr-startup/400/300"))
+        add(event("61", "Android Dev Meetup", "Deep dive into Jetpack Compose animations and Material 3. Hands-on workshop.", categories[4], 12.9772, 77.6377, "Google Office, Indiranagar", "Bangalore", 5, null))
+        add(event("62", "AI/ML Conference Bangalore", "Full-day conference on generative AI, LLMs, and practical ML applications.", categories[4], 12.9570, 77.7009, "NIMHANS Convention Centre", "Bangalore", 10, "https://picsum.photos/seed/blr-ai/400/300"))
+
+        // Arts
+        add(event("63", "Rangoli Art Exhibition", "Traditional and contemporary rangoli art displayed by 30+ artists.", categories[3], 12.9857, 77.5912, "Karnataka Chitrakala Parishath", "Bangalore", 3, "https://picsum.photos/seed/blr-rangoli/400/300"))
+        add(event("64", "Kannada Theater Night", "Award-winning Kannada play performed by Ranga Shankara troupe.", categories[3], 12.9170, 77.6006, "Ranga Shankara, JP Nagar", "Bangalore", 4, null))
+
+        // Outdoor
+        add(event("65", "Nandi Hills Sunrise Trek", "Early morning trek to Nandi Hills for a spectacular sunrise. Bus from city included.", categories[5], 13.3702, 77.6835, "Nandi Hills, Chikballapur", "Bangalore", 2, "https://picsum.photos/seed/blr-nandi/400/300"))
+        add(event("66", "Lalbagh Botanical Walk", "Guided walk through the historic Lalbagh gardens. Learn about rare plant species.", categories[5], 12.9507, 77.5848, "Lalbagh Botanical Garden", "Bangalore", 1, null))
+
+        // Community
+        add(event("67", "Bangalore Comic Con", "Pop culture extravaganza with cosplay, comics, gaming, and celebrity guests.", categories[6], 12.9889, 77.7196, "KTPO Convention Centre, Whitefield", "Bangalore", 8, "https://picsum.photos/seed/blr-comiccon/400/300"))
+        add(event("68", "Church Street Flea Market", "Vintage clothing, handmade jewelry, art prints, and street food every Sunday.", categories[6], 12.9754, 77.6070, "Church Street, MG Road", "Bangalore", 0, null))
+
+        // ========== MUMBAI ==========
+        // Music
+        add(event("69", "Bollywood Night at Juhu", "Dance to Bollywood hits with live DJs on the beach. Food stalls and fire dancers.", categories[0], 19.0883, 72.8262, "Juhu Beach", "Mumbai", 2, "https://picsum.photos/seed/mum-bollywood/400/300"))
+        add(event("70", "Sufi Music Evening", "Soulful Sufi and Qawwali performances at the historic Haji Ali precinct.", categories[0], 18.9827, 72.8089, "Haji Ali Dargah Area", "Mumbai", 5, null))
+
+        // Sports
+        add(event("71", "Marine Drive Morning Yoga", "Free sunrise yoga session along the Queen's Necklace. Mats provided.", categories[1], 18.9432, 72.8235, "Marine Drive Promenade", "Mumbai", 0, "https://picsum.photos/seed/mum-yoga/400/300"))
+        add(event("72", "Mumbai Marathon Practice Run", "Official practice run for the Tata Mumbai Marathon. 10K route through SoBo.", categories[1], 18.9256, 72.8242, "CST to Worli Sea Link Route", "Mumbai", 3, null))
+
+        // Food & Drink
+        add(event("73", "Mohammed Ali Road Food Walk", "Legendary street food experience — kebabs, nihari, malpua, and falooda.", categories[2], 18.9580, 72.8345, "Mohammed Ali Road", "Mumbai", 1, "https://picsum.photos/seed/mum-kebab/400/300"))
+        add(event("74", "Vada Pav Championship", "Mumbai's best vada pav makers compete. Public tasting and voting.", categories[2], 19.0176, 72.8562, "Dadar West", "Mumbai", 4, null))
+        add(event("75", "Colaba Cafe Hopping", "Guided tour of Mumbai's iconic cafes — Leopold, Theobroma, and hidden gems.", categories[2], 18.9067, 72.8147, "Colaba Causeway", "Mumbai", 2, "https://picsum.photos/seed/mum-cafe/400/300"))
+
+        // Arts
+        add(event("76", "Kala Ghoda Art Walk", "Self-guided art walk through galleries, street art, and installations in Kala Ghoda.", categories[3], 18.9286, 72.8324, "Kala Ghoda Art District", "Mumbai", 1, "https://picsum.photos/seed/mum-kalaghoda/400/300"))
+        add(event("77", "Prithvi Theatre Festival", "Week-long theater festival featuring Hindi, Marathi, and English plays.", categories[3], 19.0710, 72.8354, "Prithvi Theatre, Juhu", "Mumbai", 6, null))
+
+        // Tech
+        add(event("78", "Fintech Mumbai Meetup", "Payments, UPI, and digital banking — talks from industry leaders.", categories[4], 19.0654, 72.8687, "BKC Tech Hub, Bandra", "Mumbai", 3, "https://picsum.photos/seed/mum-fintech/400/300"))
+
+        // Outdoor
+        add(event("79", "Sanjay Gandhi Park Nature Walk", "Guided nature trail through the national park. Spot butterflies, birds, and deer.", categories[5], 19.2147, 72.9106, "Sanjay Gandhi National Park", "Mumbai", 2, "https://picsum.photos/seed/mum-park/400/300"))
+
+        // Community
+        add(event("80", "Bandra Fair", "Annual celebration with rides, food stalls, music, and cultural performances.", categories[6], 19.0509, 72.8274, "Mount Mary Church, Bandra", "Mumbai", 7, "https://picsum.photos/seed/mum-fair/400/300"))
+
+        // ========== NEW DELHI ==========
+        // Music
+        add(event("81", "Qutub Festival", "Classical music and dance under the Qutub Minar. Annual cultural celebration.", categories[0], 28.5245, 77.1855, "Qutub Minar Complex", "New Delhi", 5, "https://picsum.photos/seed/del-qutub/400/300"))
+        add(event("82", "Hauz Khas Live Music Night", "Indie bands perform at the lakeside venue in Hauz Khas Village.", categories[0], 28.5494, 77.2001, "Hauz Khas Village", "New Delhi", 1, null))
+
+        // Sports
+        add(event("83", "Delhi Half Marathon", "Annual half marathon through Rajpath and India Gate. 20,000+ runners.", categories[1], 28.6129, 77.2295, "India Gate, Rajpath", "New Delhi", 10, "https://picsum.photos/seed/del-marathon/400/300"))
+        add(event("84", "Morning Cricket at Lodhi Garden", "Casual morning cricket match in the beautiful Lodhi Garden grounds.", categories[1], 28.5931, 77.2197, "Lodhi Garden", "New Delhi", 0, null))
+
+        // Food & Drink
+        add(event("85", "Chandni Chowk Food Trail", "Explore Old Delhi's 400-year-old food legacy — paranthas, chaat, jalebis, and lassi.", categories[2], 28.6506, 77.2302, "Chandni Chowk", "New Delhi", 1, "https://picsum.photos/seed/del-chaat/400/300"))
+        add(event("86", "Khan Market Wine Tasting", "Premium wine tasting event featuring Indian and international vineyards.", categories[2], 28.6005, 77.2274, "Khan Market", "New Delhi", 4, null))
+        add(event("87", "Dilli Haat Craft & Food Fest", "Handicrafts from every Indian state paired with regional cuisines.", categories[2], 28.5733, 77.2076, "Dilli Haat, INA", "New Delhi", 2, "https://picsum.photos/seed/del-haat/400/300"))
+
+        // Arts
+        add(event("88", "National Gallery Exhibition", "Retrospective of modern Indian art featuring works from 1940s to present.", categories[3], 28.6110, 77.2390, "National Gallery of Modern Art", "New Delhi", 3, "https://picsum.photos/seed/del-gallery/400/300"))
+        add(event("89", "Kathak Dance Performance", "Classical Kathak recital at the India Habitat Centre.", categories[3], 28.5874, 77.2221, "India Habitat Centre, Lodhi Rd", "New Delhi", 6, null))
+
+        // Tech
+        add(event("90", "Delhi NCR Developer Summit", "Full-day tech summit covering cloud, DevOps, and mobile development.", categories[4], 28.4595, 77.0266, "Cyber Hub, Gurugram", "New Delhi", 7, "https://picsum.photos/seed/del-tech/400/300"))
+
+        // Outdoor
+        add(event("91", "Yamuna Biodiversity Park Walk", "Guided eco-walk through the biodiversity park. Bird watching and nature talks.", categories[5], 28.7041, 77.2025, "Yamuna Biodiversity Park", "New Delhi", 1, "https://picsum.photos/seed/del-yamuna/400/300"))
+
+        // Community
+        add(event("92", "Connaught Place Sunday Market", "Books, vinyl records, vintage finds, and street performances every Sunday.", categories[6], 28.6315, 77.2167, "Connaught Place Inner Circle", "New Delhi", 0, null))
+
+        // ========== MYSURU (Mysore) ==========
+        // Music
+        add(event("93", "Mysore Palace Concert", "Classical music concert in the palace courtyard during the illumination evening.", categories[0], 12.3052, 76.6552, "Mysore Palace", "Mysuru", 3, "https://picsum.photos/seed/mys-palace/400/300"))
+
+        // Sports
+        add(event("94", "Yoga at Mysore Shala", "Traditional Ashtanga yoga practice at one of the world-famous Mysore shalas.", categories[1], 12.3156, 76.6502, "Gokulam, Mysore", "Mysuru", 0, "https://picsum.photos/seed/mys-yoga/400/300"))
+        add(event("95", "Chamundi Hill Run", "5K uphill run/walk to the Chamundeshwari Temple. Stunning city views.", categories[1], 12.2724, 76.6700, "Chamundi Hill Base", "Mysuru", 2, null))
+
+        // Food & Drink
+        add(event("96", "Mysore Dosa & Filter Coffee Walk", "Taste the authentic Mysore masala dosa at iconic local joints. 5 stops.", categories[2], 12.2958, 76.6394, "Devaraja Market Area", "Mysuru", 1, "https://picsum.photos/seed/mys-dosa/400/300"))
+        add(event("97", "Mysore Pak Making Workshop", "Learn to make the legendary Mysore Pak sweet from master confectioners.", categories[2], 12.3050, 76.6554, "Guru Sweet Mart, Sayyaji Rao Rd", "Mysuru", 4, null))
+
+        // Arts
+        add(event("98", "Mysore Painting Exhibition", "Traditional Mysore-style paintings with gold leaf work by local artisans.", categories[3], 12.3052, 76.6552, "Jaganmohan Palace Art Gallery", "Mysuru", 2, "https://picsum.photos/seed/mys-painting/400/300"))
+        add(event("99", "Sandalwood Craft Workshop", "Hands-on sandalwood carving workshop with master craftsmen.", categories[3], 12.2990, 76.6460, "Cauvery Arts & Crafts Emporium", "Mysuru", 5, null))
+
+        // Outdoor
+        add(event("100", "Brindavan Gardens Evening Visit", "Musical fountain show and gardens lit up beautifully at sunset.", categories[5], 12.4218, 76.5731, "Brindavan Gardens, KRS Dam", "Mysuru", 3, "https://picsum.photos/seed/mys-brindavan/400/300"))
     }
 
     private fun event(
@@ -125,7 +231,7 @@ class FakeEventRepository @Inject constructor() : EventRepository {
             ticketUrl = null,
             priceMin = if (id.toInt() % 3 == 0) null else (id.toInt() * 5).toDouble(),
             priceMax = if (id.toInt() % 3 == 0) null else (id.toInt() * 10).toDouble(),
-            currency = "USD",
+            currency = if (lat > 30.0 || lat < 6.0) "USD" else "INR",
             tags = listOf(category.slug, city.lowercase()),
             images = emptyList(),
             distanceMeters = null,
@@ -187,7 +293,7 @@ class FakeEventRepository @Inject constructor() : EventRepository {
     }
 
     override fun searchEvents(query: String, filter: EventFilter): Flow<List<Event>> {
-        val defaultLocation = Location(40.7128, -74.0060) // NYC
+        val defaultLocation = Location(12.9716, 77.5946) // Bangalore
         val searchFilter = filter.copy(query = query, radiusMeters = filter.radiusMeters.coerceAtLeast(50000))
         return getNearbyEvents(defaultLocation, searchFilter)
     }
