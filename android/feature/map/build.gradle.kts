@@ -43,5 +43,8 @@ dependencies {
 
     implementation(libs.maplibre)
 
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
+
     debugImplementation(libs.compose.ui.tooling)
 }

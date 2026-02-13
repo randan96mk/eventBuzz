@@ -5,23 +5,35 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +43,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
@@ -40,10 +55,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import app.eventbuzz.core.ui.components.EventCard
-import app.eventbuzz.core.ui.components.EventCardData
 import app.eventbuzz.core.ui.components.LoadingIndicator
 import app.eventbuzz.domain.model.Event
+import coil3.compose.AsyncImage
 import org.maplibre.android.MapLibre
 import org.maplibre.android.annotations.IconFactory
 import org.maplibre.android.annotations.MarkerOptions
@@ -52,7 +66,6 @@ import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.MapLibreMap
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     onEventClick: (String) -> Unit,
@@ -63,114 +76,202 @@ fun MapScreen(
     val selectedEvent = (uiState as? MapUiState.Success)?.selectedEvent
     val currentStyle = (uiState as? MapUiState.Success)?.mapStyle ?: MapStyle.LIBERTY
 
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false,
-        )
-    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (val state = uiState) {
+            is MapUiState.Loading -> LoadingIndicator()
 
-    LaunchedEffect(selectedEvent) {
-        if (selectedEvent != null) {
-            scaffoldState.bottomSheetState.partialExpand()
-        } else {
-            scaffoldState.bottomSheetState.hide()
-        }
-    }
+            is MapUiState.Error -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = state.message,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                    Button(
+                        onClick = { viewModel.retry() },
+                        modifier = Modifier.padding(top = 16.dp),
+                    ) {
+                        Text("Retry")
+                    }
+                }
+            }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = if (selectedEvent != null) 200.dp else 0.dp,
-        sheetContent = {
-            selectedEvent?.let { event ->
-                EventCard(
-                    event = EventCardData(
-                        id = event.id,
-                        title = event.title,
-                        imageUrl = event.imageUrl,
-                        date = event.startDate.toString(),
-                        distance = event.distanceMeters?.let { "${(it / 1000).toInt()} km" },
-                        category = event.category.name,
-                    ),
-                    onClick = { onEventClick(event.id) },
+            is MapUiState.Success -> {
+                // Map view (full screen, behind overlays)
+                MapLibreView(
+                    events = state.events,
+                    mapStyle = state.mapStyle,
+                    centerLat = userLocation?.latitude ?: 12.9716,
+                    centerLng = userLocation?.longitude ?: 77.5946,
+                    onMarkerClick = { event -> viewModel.selectEvent(event) },
+                    onMapTap = { viewModel.selectEvent(null) },
+                    modifier = Modifier.fillMaxSize(),
+                )
+
+                // Map style selector overlay at top
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                )
-            }
-        },
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-        ) {
-            when (val state = uiState) {
-                is MapUiState.Loading -> LoadingIndicator()
-
-                is MapUiState.Error -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = state.message,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .zIndex(1f),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    MapStyle.entries.forEach { style ->
+                        FilterChip(
+                            selected = currentStyle == style,
+                            onClick = { viewModel.setMapStyle(style) },
+                            label = {
+                                Text(
+                                    text = style.label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                enabled = true,
+                                selected = currentStyle == style,
+                            ),
                         )
-                        Button(
-                            onClick = { viewModel.retry() },
-                            modifier = Modifier.padding(top = 16.dp),
-                        ) {
-                            Text("Retry")
-                        }
                     }
                 }
 
-                is MapUiState.Success -> {
-                    // Map style selector overlay
-                    Row(
+                // Event popup card overlay — centered on map above the marker
+                AnimatedVisibility(
+                    visible = selectedEvent != null,
+                    enter = fadeIn() + scaleIn(initialScale = 0.8f),
+                    exit = fadeOut() + scaleOut(targetScale = 0.8f),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(horizontal = 24.dp)
+                        .zIndex(2f),
+                ) {
+                    selectedEvent?.let { event ->
+                        EventPopupCard(
+                            event = event,
+                            onTap = { onEventClick(event.id) },
+                            onDismiss = { viewModel.selectEvent(null) },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EventPopupCard(
+    event: Event,
+    onTap: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onTap),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            // Header row: title + close button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = event.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    event.address?.let { addr ->
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = addr,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(32.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Image + details row
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (event.imageUrl != null) {
+                    AsyncImage(
+                        model = event.imageUrl,
+                        contentDescription = event.title,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp)
-                            .zIndex(1f),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            .size(64.dp)
+                            .clip(MaterialTheme.shapes.medium),
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                }
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        MapStyle.entries.forEach { style ->
-                            FilterChip(
-                                selected = currentStyle == style,
-                                onClick = { viewModel.setMapStyle(style) },
-                                label = {
-                                    Text(
-                                        text = style.label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                    )
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                ),
-                                border = FilterChipDefaults.filterChipBorder(
-                                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                                    enabled = true,
-                                    selected = currentStyle == style,
-                                ),
+                        AssistChip(
+                            onClick = {},
+                            label = {
+                                Text(
+                                    text = event.category.name,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            },
+                        )
+                        event.distanceMeters?.let { dist ->
+                            Text(
+                                text = "${(dist / 1000).toInt()} km",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
 
-                    // Map view
-                    MapLibreView(
-                        events = state.events,
-                        mapStyle = state.mapStyle,
-                        centerLat = userLocation?.latitude ?: 40.7128,
-                        centerLng = userLocation?.longitude ?: -74.0060,
-                        onMarkerClick = { event -> viewModel.selectEvent(event) },
-                        onMapTap = { viewModel.selectEvent(null) },
-                        modifier = Modifier.fillMaxSize(),
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = event.startDate.toString().substringBefore("T"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Tap for details",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }

@@ -26,7 +26,11 @@ import app.eventbuzz.feature.profile.ProfileScreen
 import app.eventbuzz.feature.search.SearchScreen
 
 @Composable
-fun EventBuzzNavHost(modifier: Modifier = Modifier) {
+fun EventBuzzNavHost(
+    isDarkMode: Boolean = false,
+    onDarkModeChanged: (Boolean) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -101,6 +105,8 @@ fun EventBuzzNavHost(modifier: Modifier = Modifier) {
 
             composable(TopLevelDestination.PROFILE.route) {
                 ProfileScreen(
+                    isDarkMode = isDarkMode,
+                    onDarkModeChanged = onDarkModeChanged,
                     onNavigateToAuth = {
                         navController.navigate("auth")
                     },
