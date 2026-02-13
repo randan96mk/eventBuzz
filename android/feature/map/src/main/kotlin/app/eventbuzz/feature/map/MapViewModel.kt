@@ -25,6 +25,11 @@ class MapViewModel @Inject constructor(
     private val _userLocation = MutableStateFlow<Location?>(null)
     val userLocation: StateFlow<Location?> = _userLocation.asStateFlow()
 
+    init {
+        // Default to NYC for MVP testing
+        setUserLocation(40.7128, -74.0060)
+    }
+
     fun setUserLocation(latitude: Double, longitude: Double) {
         val location = Location(latitude, longitude)
         _userLocation.value = location

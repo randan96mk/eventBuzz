@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eventbuzz.core.ui.components.EventCard
+import app.eventbuzz.core.ui.components.EventCardData
 import app.eventbuzz.core.ui.components.LoadingIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,12 +46,14 @@ fun MapScreen(
         sheetContent = {
             selectedEvent?.let { event ->
                 EventCard(
-                    title = event.title,
-                    dateTime = event.startDate.toString(),
-                    category = event.category.name,
-                    categoryColor = event.category.colorHex,
-                    distance = event.distanceMeters?.let { "${(it / 1000).toInt()} km" },
-                    imageUrl = event.imageUrl,
+                    event = EventCardData(
+                        id = event.id,
+                        title = event.title,
+                        imageUrl = event.imageUrl,
+                        date = event.startDate.toString(),
+                        distance = event.distanceMeters?.let { "${(it / 1000).toInt()} km" },
+                        category = event.category.name,
+                    ),
                     onClick = { onEventClick(event.id) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -88,7 +91,6 @@ fun MapScreen(
 
                 is MapUiState.Success -> {
                     // TODO: Replace with MapLibre MapView integration
-                    // MapLibre composable will render here with event markers
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center,

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.eventbuzz.core.ui.components.EventCard
+import app.eventbuzz.core.ui.components.EventCardData
 import app.eventbuzz.core.ui.components.LoadingIndicator
 import app.eventbuzz.domain.model.SortOption
 
@@ -87,12 +88,14 @@ fun ListScreen(
                     ) {
                         items(uiState.events, key = { it.id }) { event ->
                             EventCard(
-                                title = event.title,
-                                dateTime = event.startDate.toString(),
-                                category = event.category.name,
-                                categoryColor = event.category.colorHex,
-                                distance = event.distanceMeters?.let { "${(it / 1000).toInt()} km" },
-                                imageUrl = event.imageUrl,
+                                event = EventCardData(
+                                    id = event.id,
+                                    title = event.title,
+                                    imageUrl = event.imageUrl,
+                                    date = event.startDate.toString(),
+                                    distance = event.distanceMeters?.let { "${(it / 1000).toInt()} km" },
+                                    category = event.category.name,
+                                ),
                                 onClick = { onEventClick(event.id) },
                             )
                         }

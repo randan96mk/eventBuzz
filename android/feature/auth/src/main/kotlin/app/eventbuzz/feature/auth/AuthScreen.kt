@@ -21,7 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun AuthScreen(
-    onAuthenticated: () -> Unit,
+    onAuthSuccess: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel(),
 ) {
     Column(
@@ -51,7 +51,7 @@ fun AuthScreen(
 
         // Guest button
         Button(
-            onClick = { viewModel.continueAsGuest(onAuthenticated) },
+            onClick = { viewModel.continueAsGuest(onAuthSuccess) },
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Continue as Guest")

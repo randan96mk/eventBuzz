@@ -30,7 +30,11 @@ class ListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ListUiState())
     val uiState: StateFlow<ListUiState> = _uiState.asStateFlow()
 
-    private var currentLocation: Location? = null
+    private var currentLocation: Location = Location(40.7128, -74.0060) // Default NYC
+
+    init {
+        loadEvents()
+    }
 
     fun setLocation(latitude: Double, longitude: Double) {
         currentLocation = Location(latitude, longitude)
@@ -47,12 +51,11 @@ class ListViewModel @Inject constructor(
     }
 
     private fun loadEvents() {
-        val location = currentLocation ?: return
         val filter = EventFilter(sortBy = _uiState.value.sortBy)
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            getNearbyEvents(location, filter)
+            getNearbyEvents(currentLocation, filter)
                 .catch { e ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,

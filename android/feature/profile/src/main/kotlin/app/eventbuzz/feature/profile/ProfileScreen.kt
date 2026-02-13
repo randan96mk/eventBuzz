@@ -21,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    onNavigateToAuth: () -> Unit = {},
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,7 +45,7 @@ fun ProfileScreen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
-            onClick = { /* TODO: navigate to auth */ },
+            onClick = onNavigateToAuth,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Create Account")
