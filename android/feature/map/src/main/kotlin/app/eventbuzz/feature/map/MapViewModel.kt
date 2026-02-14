@@ -50,6 +50,18 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    fun setSortMode(mode: SortMode) {
+        val current = _uiState.value
+        if (current is MapUiState.Success) {
+            val sorted = when (mode) {
+                SortMode.DISTANCE -> current.events.sortedBy { it.distanceMeters ?: Double.MAX_VALUE }
+                SortMode.DATE -> current.events.sortedBy { it.startDate }
+                SortMode.POPULAR -> current.events.sortedByDescending { it.tags.size }
+            }
+            _uiState.value = current.copy(events = sorted, sortMode = mode)
+        }
+    }
+
     private fun loadEvents(location: Location) {
         viewModelScope.launch {
             _uiState.value = MapUiState.Loading
