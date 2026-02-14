@@ -10,10 +10,15 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,8 +29,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -52,10 +63,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,6 +86,9 @@ import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.MapLibreMap
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun MapScreen(
@@ -81,17 +97,28 @@ fun MapScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
-    val selectedEvent = (uiState as? MapUiState.Success)?.selectedEvent
-    val currentStyle = (uiState as? MapUiState.Success)?.mapStyle ?: MapStyle.LIBERTY
+    var isMapExpanded by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessMediumLow,
+                ),
+            ),
+    ) {
         when (val state = uiState) {
             is MapUiState.Loading -> LoadingIndicator()
 
             is MapUiState.Error -> {
                 Column(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = state.message,
@@ -108,87 +135,314 @@ fun MapScreen(
             }
 
             is MapUiState.Success -> {
-                // Track the Box size so we can position popup above center
-                // (animateCamera always centers the tapped marker on screen)
-                var boxSize by remember { mutableStateOf(IntSize.Zero) }
-                val density = LocalDensity.current
+                val selectedEvent = state.selectedEvent
+                val currentStyle = state.mapStyle
 
-                // Map view (full screen, behind overlays)
-                MapLibreView(
-                    events = state.events,
-                    mapStyle = state.mapStyle,
-                    centerLat = userLocation?.latitude ?: 12.9716,
-                    centerLng = userLocation?.longitude ?: 77.5946,
-                    onMarkerClick = { event ->
-                        viewModel.selectEvent(event)
-                    },
-                    onMapTap = { viewModel.selectEvent(null) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .onGloballyPositioned { boxSize = it.size },
-                )
-
-                // Map style selector overlay at top
-                Row(
-                    modifier = Modifier
+                // Map section — expands to full screen on tap, collapses back
+                val mapModifier = if (isMapExpanded) {
+                    Modifier.fillMaxSize()
+                } else {
+                    Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                        .zIndex(1f),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    MapStyle.entries.forEach { style ->
-                        FilterChip(
-                            selected = currentStyle == style,
-                            onClick = { viewModel.setMapStyle(style) },
-                            label = {
-                                Text(
-                                    text = style.label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            ),
-                            border = FilterChipDefaults.filterChipBorder(
-                                borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                                enabled = true,
+                        .height(260.dp)
+                }
+
+                Box(modifier = mapModifier) {
+                    var mapBoxSize by remember { mutableStateOf(IntSize.Zero) }
+                    val density = LocalDensity.current
+
+                    MapLibreView(
+                        events = state.events,
+                        mapStyle = state.mapStyle,
+                        centerLat = userLocation?.latitude ?: 12.9716,
+                        centerLng = userLocation?.longitude ?: 77.5946,
+                        onMarkerClick = { event -> viewModel.selectEvent(event) },
+                        onMapTap = {
+                            if (selectedEvent != null) {
+                                viewModel.selectEvent(null)
+                            } else {
+                                isMapExpanded = !isMapExpanded
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .onGloballyPositioned { mapBoxSize = it.size },
+                    )
+
+                    // Map style chips overlay
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                            .zIndex(1f),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        MapStyle.entries.forEach { style ->
+                            FilterChip(
                                 selected = currentStyle == style,
-                            ),
-                        )
+                                onClick = { viewModel.setMapStyle(style) },
+                                label = {
+                                    Text(
+                                        text = style.label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                ),
+                                border = FilterChipDefaults.filterChipBorder(
+                                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                                    enabled = true,
+                                    selected = currentStyle == style,
+                                ),
+                            )
+                        }
+                    }
+
+                    // Collapse button — shown only in expanded mode
+                    if (isMapExpanded) {
+                        IconButton(
+                            onClick = { isMapExpanded = false },
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 16.dp)
+                                .zIndex(3f)
+                                .size(40.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                    shape = CircleShape,
+                                ),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Collapse map",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+
+                    // Event popup card overlay
+                    var popupSize by remember { mutableStateOf(IntSize.Zero) }
+
+                    AnimatedVisibility(
+                        visible = selectedEvent != null,
+                        enter = fadeIn() + scaleIn(initialScale = 0.8f),
+                        exit = fadeOut() + scaleOut(targetScale = 0.8f),
+                        modifier = Modifier
+                            .zIndex(2f)
+                            .onGloballyPositioned { popupSize = it.size }
+                            .offset {
+                                val markerIconPx = 48
+                                val gapPx = with(density) { 8.dp.roundToPx() }
+                                val x = (mapBoxSize.width - popupSize.width) / 2
+                                val y = mapBoxSize.height / 2 - markerIconPx / 2 - gapPx - popupSize.height
+                                IntOffset(x.coerceAtLeast(0), y.coerceAtLeast(0))
+                            },
+                    ) {
+                        selectedEvent?.let { event ->
+                            EventPopupCard(
+                                event = event,
+                                onTap = { onEventClick(event.id) },
+                                onDismiss = { viewModel.selectEvent(null) },
+                            )
+                        }
                     }
                 }
 
-                // Event popup card overlay — positioned above the tapped marker
-                var popupSize by remember { mutableStateOf(IntSize.Zero) }
+                // Nearby Events section — hidden when map is expanded
+                if (!isMapExpanded) {
+                    NearbyEventsSection(
+                        events = state.events,
+                        sortMode = state.sortMode,
+                        onSortModeChange = { viewModel.setSortMode(it) },
+                        onEventClick = onEventClick,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+    }
+}
 
-                AnimatedVisibility(
-                    visible = selectedEvent != null,
-                    enter = fadeIn() + scaleIn(initialScale = 0.8f),
-                    exit = fadeOut() + scaleOut(targetScale = 0.8f),
+@Composable
+private fun NearbyEventsSection(
+    events: List<Event>,
+    sortMode: SortMode,
+    onSortModeChange: (SortMode) -> Unit,
+    onEventClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val dateFormatter = remember {
+        DateTimeFormatter.ofPattern("MMM d, yyyy '\u2022' h:mm a", Locale.ENGLISH)
+            .withZone(ZoneId.systemDefault())
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
+        // Section header
+        Text(
+            text = "Nearby Events",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 4.dp),
+        )
+
+        // Sort chips
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(bottom = 8.dp),
+        ) {
+            items(SortMode.entries.size) { index ->
+                val mode = SortMode.entries[index]
+                FilterChip(
+                    selected = sortMode == mode,
+                    onClick = { onSortModeChange(mode) },
+                    label = {
+                        Text(
+                            text = mode.label,
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        borderColor = MaterialTheme.colorScheme.outline,
+                        enabled = true,
+                        selected = sortMode == mode,
+                    ),
+                )
+            }
+        }
+
+        // Event cards list
+        LazyColumn(
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            items(events, key = { it.id }) { event ->
+                NearbyEventCard(
+                    event = event,
+                    dateFormatter = dateFormatter,
+                    onClick = { onEventClick(event.id) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun NearbyEventCard(
+    event: Event,
+    dateFormatter: DateTimeFormatter,
+    onClick: () -> Unit,
+) {
+    val categoryColor = remember(event.category.colorHex) {
+        androidx.compose.ui.graphics.Color(Color.parseColor(event.category.colorHex))
+    }
+
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Event image
+            if (event.imageUrl != null) {
+                AsyncImage(
+                    model = event.imageUrl,
+                    contentDescription = event.title,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .zIndex(2f)
-                        .onGloballyPositioned { popupSize = it.size }
-                        .offset {
-                            // animateCamera centers the tapped marker on screen,
-                            // so the marker lands at (boxCenter.x, boxCenter.y).
-                            // Position popup so its pointer tip sits just above the marker.
-                            val markerIconPx = 48 // marker bitmap size in px
-                            val gapPx = with(density) { 8.dp.roundToPx() }
-
-                            // Center popup horizontally
-                            val x = (boxSize.width - popupSize.width) / 2
-                            // Place popup above the marker center
-                            val y = boxSize.height / 2 - markerIconPx / 2 - gapPx - popupSize.height
-
-                            IntOffset(x.coerceAtLeast(0), y.coerceAtLeast(0))
-                        },
+                        .size(68.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                )
+            } else {
+                // Colored placeholder based on category
+                Box(
+                    modifier = Modifier
+                        .size(68.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(categoryColor.copy(alpha = 0.8f)),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    selectedEvent?.let { event ->
-                        EventPopupCard(
-                            event = event,
-                            onTap = { onEventClick(event.id) },
-                            onDismiss = { viewModel.selectEvent(null) },
+                    Text(
+                        text = event.category.name.first().uppercase(),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = androidx.compose.ui.graphics.Color.White,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                // Title
+                Text(
+                    text = event.title,
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                // Date
+                Text(
+                    text = dateFormatter.format(event.startDate),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                // Category chip + distance
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    // Category chip with colored background
+                    Text(
+                        text = event.category.name,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                        color = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier
+                            .background(
+                                color = categoryColor,
+                                shape = RoundedCornerShape(12.dp),
+                            )
+                            .padding(horizontal = 10.dp, vertical = 2.dp),
+                    )
+
+                    event.distanceMeters?.let { dist ->
+                        val distText = if (dist < 1000) {
+                            "${dist.toInt()} m"
+                        } else {
+                            "%.1f km".format(dist / 1000)
+                        }
+                        Text(
+                            text = distText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
