@@ -226,7 +226,7 @@ fun MapScreen(
                     // Event popup card overlay
                     var popupSize by remember { mutableStateOf(IntSize.Zero) }
 
-                    AnimatedVisibility(
+                    androidx.compose.animation.AnimatedVisibility(
                         visible = selectedEvent != null,
                         enter = fadeIn() + scaleIn(initialScale = 0.8f),
                         exit = fadeOut() + scaleOut(targetScale = 0.8f),
